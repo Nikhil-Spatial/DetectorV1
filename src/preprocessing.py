@@ -5,15 +5,9 @@ import numpy as np
 import csv
 import os
 
-# store the annotations directory
-annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
-annot_list = os.listdir(annot_dir)
-
-csv_file_path = Path("../data/preprocessed/annotations.csv")
-
 # parse individual xml files
 def parse_xml(xml_path, writer):
-    tree = ET.parse(os.path.join(annot_dir, xml_path))
+    tree = ET.parse(xml_path)
     root = tree.getroot()
 
     filename = root.find("filename").text
@@ -39,10 +33,25 @@ def parse_xml(xml_path, writer):
         # convert (xmin, ymin, xmax, ymax) to (x, y, w, h) format
         x = np.round(np.mean([xmin,xmax]))
         y = np.round(np.mean([ymin, ymax]))
-        w = np.round((xmax - xmin) / IMAGE_SIZE)
-        h = np.round((ymax - ymin) / IMAGE_SIZE)
+        w = np.round((xmax - xmin))
+        h = np.round((ymax - ymin))
 
         # write to annotations.csv file
         writer.writerow([filename, class_name, x, y, w, h])
 
+# preprocess the entire raw annotations and write them to a clean csv file
+def preprocess():
+    # store the annotations directory and list of xml files contained in it
+    annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
+    annot_list = os.listdir(annot_dir)
 
+    csv_file_path = Path("../data/preprocessed/annotations.csv")
+
+    with open (csv_file_path, "w", newline="") as csv_file:
+        writer = csv.writer(csv_file, delimiter=",")
+
+        for annot in annot_list:
+            parse_xml(os.path.join(annot_dir, annot), writer)
+
+if __name__ == "__main__":
+    preprocess()
