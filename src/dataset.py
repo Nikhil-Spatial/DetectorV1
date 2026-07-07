@@ -31,7 +31,7 @@ class ImageDataset(Dataset):
         img_path = self.img_dir / img_filename
         image = decode_image(img_path)
 
-        labels = _get_labels(img_filename)
+        labels = self._get_labels(img_filename)
 
         if self.transform:
             image = self.transform(image)
@@ -39,5 +39,3 @@ class ImageDataset(Dataset):
             labels = self.target_transform(labels)
 
         return image, labels
-
-
