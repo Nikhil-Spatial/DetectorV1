@@ -1,6 +1,5 @@
 from torchvision.io import decode_image
 from torch.utils.data import Dataset
-from utils.py import get_labels
 import pandas as pd
 
 class ImageDataset(Dataset):
@@ -14,15 +13,25 @@ class ImageDataset(Dataset):
         self.target_transform = target_transform
 
     def __len__(self):
-        return len(self.img_labels)
+        return len(self.filenames)
+
+    def _get_labels(self, filename):
+        group = self.groups.get_group(filename).drop(columns=["filename"])
+
+        objects = []
+        for i in range(len(group)):
+            obj_tuple = tuple(group.iloc[i])
+            objects.append(obj_tuple)
+
+        return objects
 
     def __getitem__(self, idx):
         img_filename = self.filenames[idx]
 
-        img_path = img_dir / img_filename
+        img_path = self.img_dir / img_filename
         image = decode_image(img_path)
 
-        labels = get_labels(self.groups, img_filename)
+        labels = _get_labels(img_filename)
 
         if self.transform:
             image = self.transform(image)
@@ -30,3 +39,5 @@ class ImageDataset(Dataset):
             labels = self.target_transform(labels)
 
         return image, labels
+
+
