@@ -39,8 +39,10 @@ def parse_xml(xml_path, writer):
         writer.writerow([filename, class_name, x, y, w, h])
 
 # write to csv annotations files
-def write_csv(csv_file_path, annot_dir):
-    with open (csv_file_path, "w", newline="") as csv_file:
+def write_csv(csv_annot_dir, annot_dir):
+    csv_annot_dir.mkdir(parents=True, exist_ok=True)
+
+    with open (csv_annot_dir / "annotations.csv", "w", newline="") as csv_file:
         writer = csv.writer(csv_file, delimiter=",")
 
         writer.writerow(["filename", "class_name", "x", "y", "w", "h"])
@@ -50,9 +52,9 @@ def write_csv(csv_file_path, annot_dir):
 
 # resize image dimensions to 224x224
 def process_images(img_dir, preprocessed_img_dir):
-    img_dir_iter = img_dir.iterdir()
+    preprocessed_img_dir.mkdir(parents=True, exist_ok=True)
 
-    for img_path in img_dir_iter:
+    for img_path in img_dir.glob("*.jpg"):
         preprocessed_img_path = preprocessed_img_dir / img_path.name
 
         with Image.open(img_path) as img:
@@ -66,11 +68,11 @@ def preprocess():
     trainval_annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
     test_annot_dir = Path("../data/raw/VOCtest-2007/Annotations")
 
-    trainval_csv_path = Path("../data/preprocessed/trainval/annotations.csv")
-    test_csv_path = Path("../data/preprocessed/test/annotations.csv")
+    trainval_csv_annot_dir = Path("../data/preprocessed/trainval")
+    test_csv_annot_dir = Path("../data/preprocessed/test")
 
-    write_csv(trainval_csv_path, trainval_annot_dir)
-    write_csv(test_csv_path, test_annot_dir)
+    write_csv(trainval_csv_annot_dir, trainval_annot_dir)
+    write_csv(test_csv_annot_dir, test_annot_dir)
 
     # store the train/val and test image directories---raw and preprocessed
     trainval_img_dir = Path("../data/raw/VOCtrainval-2007/JPEGImages")
