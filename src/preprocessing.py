@@ -39,12 +39,8 @@ def parse_xml(xml_path, writer):
         # write to annotations.csv file
         writer.writerow([filename, class_name, x, y, w, h])
 
-# preprocess the entire raw annotations and write them to a clean csv file
-def preprocess():
-    # store the annotations directory
-    annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
-    csv_file_path = Path("../data/preprocessed/annotations.csv")
-
+# write to csv annotations files
+def write_csv(csv_file_path, annot_dir):
     with open (csv_file_path, "w", newline="") as csv_file:
         writer = csv.writer(csv_file, delimiter=",")
 
@@ -52,6 +48,21 @@ def preprocess():
 
         for annot_path in annot_dir.glob("*.xml"):
             parse_xml(annot_path, writer)
+
+# def process_images():
+#     image_dir = Path("../data/raw/")
+
+# preprocess the entire raw annotations and write them to a clean csv file
+def preprocess():
+    # store the train/val and test annotations directories
+    trainval_annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
+    test_annot_dir = Path("../data/raw/VOCtest-2007/Annotations")
+
+    trainval_csv_path = Path("../data/preprocessed/trainval/annotations.csv")
+    test_csv_path = Path("../data/preprocessed/test/annotations.csv")
+
+    write_csv(trainval_csv_path, trainval_annot_dir)
+    write_csv(test_csv_path, test_annot_dir)
 
 if __name__ == "__main__":
     preprocess()
