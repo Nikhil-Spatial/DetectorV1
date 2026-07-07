@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+from PIL import Image
 from configs import IMAGE_SIZE
 from pathlib import Path
 import numpy as np
@@ -49,10 +50,19 @@ def write_csv(csv_file_path, annot_dir):
         for annot_path in annot_dir.glob("*.xml"):
             parse_xml(annot_path, writer)
 
-# def process_images():
-#     image_dir = Path("../data/raw/")
+# resize image dimensions to 224x224
+def process_images(img_dir, preprocessed_img_dir):
+    img_dir_list = os.listdir(img_dir)
 
-# preprocess the entire raw annotations and write them to a clean csv file
+    for img_file in img_dir_list:
+        img_path = os.path.join(img_dir, img_file)
+        preprocessed_img_path = os.path.join(preprocessed_img_dir, img_file)
+        with Image.open(img_path) as img:
+            processed_img = img.resize((224, 244))
+            processed_img.save(preprocessed_img_path)
+
+# 1) raw annotations -> structure annotations.csv file
+# 2) raw image dimensions -> resize to 224x224
 def preprocess():
     # store the train/val and test annotations directories
     trainval_annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
@@ -63,6 +73,16 @@ def preprocess():
 
     write_csv(trainval_csv_path, trainval_annot_dir)
     write_csv(test_csv_path, test_annot_dir)
+
+    # store the train/val and test image directories---raw and preprocessed
+    trainval_img_dir = Path("../data/raw/VOCtrainval-2007/JPEGImages")
+    test_img_dir = Path("../data/raw/VOCtest-2007/JPEGImages")
+
+    trainval_preprocessed_img_dir = Path("../data/preprocessed/trainval/Images")
+    test_preprocessed_img_dir = Path("../data/preprocessed/test/Images")
+
+    process_images(trainval_img_dir, trainval_preprocessed_img_dir)
+    process_images(test_img_dir, test_preprocessed_img_dir)
 
 if __name__ == "__main__":
     preprocess()
