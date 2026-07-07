@@ -19,8 +19,8 @@ class ImageDataset(Dataset):
         group = self.groups.get_group(filename).drop(columns=["filename"])
 
         objects = []
-        for i in group.iterrows():
-            objects.append(tuple(i[1]))
+        for _, row in group.iterrows():
+            objects.append(tuple(row))
 
         return objects
 
