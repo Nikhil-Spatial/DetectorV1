@@ -1,10 +1,8 @@
 import xml.etree.ElementTree as ET
-from PIL import Image
 from configs import IMAGE_SIZE
 from pathlib import Path
-import numpy as np
+from PIL import Image
 import csv
-import os
 
 # parse individual xml files
 def parse_xml(xml_path, writer):
@@ -52,13 +50,13 @@ def write_csv(csv_file_path, annot_dir):
 
 # resize image dimensions to 224x224
 def process_images(img_dir, preprocessed_img_dir):
-    img_dir_list = os.listdir(img_dir)
+    img_dir_iter = img_dir.iterdir()
 
-    for img_file in img_dir_list:
-        img_path = os.path.join(img_dir, img_file)
-        preprocessed_img_path = os.path.join(preprocessed_img_dir, img_file)
+    for img_path in img_dir_iter:
+        preprocessed_img_path = preprocessed_img_dir / img_path.name
+
         with Image.open(img_path) as img:
-            processed_img = img.resize((224, 244))
+            processed_img = img.resize((IMAGE_SIZE, IMAGE_SIZE))
             processed_img.save(preprocessed_img_path)
 
 # 1) raw annotations -> structure annotations.csv file
