@@ -31,27 +31,27 @@ def parse_xml(xml_path, writer):
         ymax = int(bndbox.find("ymax").text) * img_height_ratio
 
         # convert (xmin, ymin, xmax, ymax) to (x, y, w, h) format
-        x = np.round(np.mean([xmin,xmax]))
-        y = np.round(np.mean([ymin, ymax]))
-        w = np.round((xmax - xmin))
-        h = np.round((ymax - ymin))
+        x = int(round((xmin+xmax)/2))
+        y = int(round((ymin+ymax)/2))
+        w = int(round(xmax-xmin))
+        h = int(round(ymax-ymin))
 
         # write to annotations.csv file
         writer.writerow([filename, class_name, x, y, w, h])
 
 # preprocess the entire raw annotations and write them to a clean csv file
 def preprocess():
-    # store the annotations directory and list of xml files contained in it
+    # store the annotations directory
     annot_dir = Path("../data/raw/VOCtrainval-2007/Annotations")
-    annot_list = os.listdir(annot_dir)
-
     csv_file_path = Path("../data/preprocessed/annotations.csv")
 
     with open (csv_file_path, "w", newline="") as csv_file:
         writer = csv.writer(csv_file, delimiter=",")
 
-        for annot in annot_list:
-            parse_xml(os.path.join(annot_dir, annot), writer)
+        writer.writerow(["filename", "class_name", "x", "y", "w", "h"])
+
+        for annot_path in annot_dir.glob("*.xml"):
+            parse_xml(annot_path, writer)
 
 if __name__ == "__main__":
     preprocess()
