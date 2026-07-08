@@ -61,4 +61,5 @@ class Model(nn.Module):
 
         x = torch.flatten(x, start_dim=1)
         x = F.relu(self.fc_1(x))
-        return self.fc_2(x)
+        x = self.fc_2(x)
+        return x.reshape((S, S, (C + B * 5)))
