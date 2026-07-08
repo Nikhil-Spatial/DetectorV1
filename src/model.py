@@ -55,7 +55,7 @@ class Model(nn.Module):
         self.fc_2 = nn.Linear(4096, (C + B * 5) * S * S)
 
     def forward(self, x):
-        x = self.conv_1(x)
+        x = F.relu(self.conv_1(x))
         for res_block in self.res_blocks:
             x = res_block(x)
 
