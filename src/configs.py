@@ -1,8 +1,13 @@
 IMAGE_SIZE = 224
 
-GRID_SIZE = 7
+# grid dimensions 7 x 7
+S = 7
 
-NUM_CLASSES = 20
+# number of bounding boxes each cell predicts
+B = 2
+
+# number of classes
+C = 20
 
 CLASS_TO_IDX = {
     "aeroplane": 0,
