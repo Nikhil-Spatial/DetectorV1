@@ -16,7 +16,7 @@ class ResidualBlock(nn.Module):
         self.batch_norm_2 = nn.BatchNorm2d(out_channels)
 
         # check if shortcut is required
-        if in_channels != out_channels:
+        if in_channels != out_channels or stride != 1:
             self.shortcut = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride)
         else:
             self.shortcut = nn.Identity()
@@ -48,6 +48,7 @@ class Model(nn.Module):
         self.res_blocks.append(ResidualBlock(256, 256, 1))
         self.res_blocks.append(ResidualBlock(256, 256, 1))
         self.res_blocks.append(ResidualBlock(256, 512, 2))
+        self.res_blocks.append(ResidualBlock(512, 512, 2))
 
         # Detector Head
         self.fc_1 = nn.Linear(25_088, 4096)
@@ -60,4 +61,4 @@ class Model(nn.Module):
 
         x = torch.flatten(x, start_dim=1)
         x = F.relu(self.fc_1(x))
-        x = self.fc_2(x)
+        return self.fc_2(x)
