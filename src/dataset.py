@@ -1,4 +1,4 @@
-from configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE
+from src.configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE
 from torchvision.io import decode_image
 from torch.utils.data import Dataset
 import pandas as pd
@@ -57,7 +57,7 @@ class ImageDataset(Dataset):
         image = decode_image(img_path)
 
         objects = self._get_objects(img_filename)
-        target_vector = _create_target_vector(objects)
+        target_vector = self._create_target_vector(objects)
 
         if self.transform:
             image = self.transform(image)
