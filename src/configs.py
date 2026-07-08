@@ -9,6 +9,9 @@ B = 2
 # number of classes
 C = 20
 
+# height and width of a single grid cell in pixels
+CELL_SIZE = IMAGE_SIZE / S
+
 CLASS_TO_IDX = {
     "aeroplane": 0,
     "bicycle": 1,
@@ -36,3 +39,9 @@ IDX_TO_CLASS = {
     idx: class_
     for class_, idx in CLASS_TO_IDX.items()
 }
+
+# Parameters to increase the loss from bounding box coordinate predictions and
+# decrease the loss from confidence predictions for boxes that don't contain
+# objects. So, these are for the loss functions.
+LAMBDA_COORD = 5
+LAMBDA_NOOBJ = 0.5
