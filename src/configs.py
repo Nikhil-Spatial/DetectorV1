@@ -10,7 +10,7 @@ B = 2
 C = 20
 
 # height and width of a single grid cell in pixels
-CELL_SIZE = IMAGE_SIZE / S
+CELL_SIZE = int(IMAGE_SIZE / S)
 
 CLASS_TO_IDX = {
     "aeroplane": 0,
