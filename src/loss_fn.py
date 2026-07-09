@@ -20,46 +20,52 @@ class Loss(nn.Module):
         return 0 if IoU_1 > IoU_2 else 1
 
     def forward(self, pred, target):
-        loss_1 = loss_2 = loss_3 = loss_4 = loss_5 = 0
-        for i in list(range(S)):
-            for j in list(range(S)):
-                pred_cell = pred[i][j]
-                target_cell = target[i][j]
+        total_loss = 0
+        batch_size = pred.shape[0]
 
-                if target_cell[24] == 1: # if cell has object
-                    responsible = self._find_responsible_(pred_cell, target_cell, i, j)
-                    pred_bbox = pred_cell[20:25] if responsible == 0 else pred_cell[25:30]
-                    target_bbox = target_cell[20:25]
+        # compute losses for each image in the batch, total the losses, and then average them
+        for b in list(range(batch_size)):
+            loss_1 = loss_2 = loss_3 = loss_4 = loss_5 = 0
 
-                    # 1. Sum of Squared Errors (SSE) for center points
-                    loss_1 += (target_bbox[0] - pred_bbox[0]).square() + \
-                              (target_bbox[1] - pred_bbox[1]).square()
+            for i in list(range(S)):
+                for j in list(range(S)):
+                    pred_cell = pred[b][i][j]
+                    target_cell = target[b][i][j]
 
-                    # 2. SSE for square roots of width and height
-                    # avoid errors with negative predictions
-                    pred_w = torch.sign(pred_bbox[2]) * (pred_bbox[2].abs() + 1e-6).sqrt()
-                    pred_h = torch.sign(pred_bbox[3]) * (pred_bbox[3].abs() + 1e-6).sqrt()
+                    if target_cell[24] == 1: # if cell has object
+                        responsible = self._find_responsible_(pred_cell, target_cell, i, j)
+                        pred_bbox = pred_cell[20:25] if responsible == 0 else pred_cell[25:30]
+                        target_bbox = target_cell[20:25]
 
-                    loss_2 += (target_bbox[2].sqrt() - pred_w).square() + \
-                              (target_bbox[3].sqrt() - pred_h).square()
+                        # 1. Sum of Squared Errors (SSE) for center points
+                        loss_1 += (target_bbox[0] - pred_bbox[0]).square() + \
+                                  (target_bbox[1] - pred_bbox[1]).square()
 
-                    # 3. SSE for confidences of responsible bounding box predictors
-                    loss_3 += (target_bbox[4] - pred_bbox[4]).square()
+                        # 2. SSE for square roots of width and height
+                        # avoid errors with negative predictions
+                        pred_w = torch.sign(pred_bbox[2]) * (pred_bbox[2].abs() + 1e-6).sqrt()
+                        pred_h = torch.sign(pred_bbox[3]) * (pred_bbox[3].abs() + 1e-6).sqrt()
 
-                    # 4. SSE for confidences of not responsible bounding box predictors
-                    other_idx = 24 if responsible == 1 else 29
-                    loss_4 += (target_cell[other_idx] - pred_cell[other_idx]).square()
+                        loss_2 += (target_bbox[2].sqrt() - pred_w).square() + \
+                                  (target_bbox[3].sqrt() - pred_h).square()
 
-                    # 5. SSE for class probabilities
-                    for c in list(range(20)):
-                        loss_5 += (target_cell[c] - pred_cell[c]).square()
+                        # 3. SSE for confidences of responsible bounding box predictors
+                        loss_3 += (target_bbox[4] - pred_bbox[4]).square()
 
-                else:
-                    # 4. SSE for confidences of cells with no objects
-                    loss_4 += (target_cell[24] - pred_cell[24]).square() + \
-                              (target_cell[29] - pred_cell[29]).square()
+                        # 4. SSE for confidences of not responsible bounding box predictors
+                        other_idx = 24 if responsible == 1 else 29
+                        loss_4 += (target_cell[other_idx] - pred_cell[other_idx]).square()
 
-        return (LAMBDA_COORD * (loss_1 + loss_2)) + loss_3 + (LAMBDA_NOOBJ * loss_4) + loss_5
+                        # 5. SSE for class probabilities
+                        for c in list(range(20)):
+                            loss_5 += (target_cell[c] - pred_cell[c]).square()
 
+                    else:
+                        # 4. SSE for confidences of cells with no objects
+                        loss_4 += (target_cell[24] - pred_cell[24]).square() + \
+                                  (target_cell[29] - pred_cell[29]).square()
 
+            total_loss += (LAMBDA_COORD * (loss_1 + loss_2)) + \
+                          loss_3 + (LAMBDA_NOOBJ * loss_4) + loss_5
 
+        return total_loss / batch_size
