@@ -2,7 +2,7 @@ from src.configs import CELL_SIZE, IMAGE_SIZE
 from torch import round as rd
 import torch
 
-def convert_xywh_coords(bbox: tuple, row, col, draw: bool):
+def convert_xywh_coords(bbox, row, col, draw: bool):
     # 1. unnormalize
     x = (bbox[0] * CELL_SIZE) + (col * CELL_SIZE)
     y = (bbox[1] * CELL_SIZE) + (row * CELL_SIZE)
@@ -20,12 +20,12 @@ def convert_xywh_coords(bbox: tuple, row, col, draw: bool):
         return (int(rd(xmin)), int(rd(ymin)), int(rd(xmax)), int(rd(ymax)))
     return (xmin, ymin, xmax, ymax)
 
-def area(bbox: tuple):
+def area(bbox):
     w = torch.clamp(bbox[2] - bbox[0], min=0)
     h = torch.clamp(bbox[3] - bbox[1], min=0)
     return w * h
 
-def IoU(target_bbox: tuple, pred_bbox: tuple, row, col):
+def IoU(pred_bbox, target_bbox, row, col):
     # 1. convert (x, y, w, h) to (xmin, ymin, xmax, ymax)
     target = convert_xywh_coords(target_bbox, row, col, False)
     pred = convert_xywh_coords(pred_bbox, row, col, False)
@@ -35,7 +35,7 @@ def IoU(target_bbox: tuple, pred_bbox: tuple, row, col):
     ymin = torch.max(target[1], pred[1])
     xmax = torch.min(target[2], pred[2])
     ymax = torch.min(target[3], pred[3])
-    
+
     inter = (xmin, ymin, xmax, ymax)
 
     # 3. find areas of boxes
