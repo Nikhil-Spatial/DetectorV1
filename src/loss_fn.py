@@ -1,6 +1,7 @@
-from configs import LAMBDA_COORD, LAMBDA_NOOBJ, S, B
+from configs import LAMBDA_COORD, LAMBDA_NOOBJ, S
 import torch.nn as nn
-from uilts import IoU
+from utils import IoU
+import torch
 
 class Loss(nn.Module):
     def __init__(self):
@@ -20,14 +21,13 @@ class Loss(nn.Module):
 
     def forward(self, pred, target):
         loss_1 = loss_2 = loss_3 = loss_4 = loss_5 = 0
-        for i in list(range(7)):
-            for j in list(range(7)):
+        for i in list(range(S)):
+            for j in list(range(S)):
                 pred_cell = pred[i][j]
                 target_cell = target[i][j]
-                cell_has_object = target_cell[24] == 1 or target_cell[29] == 1
 
-                if cell_has_object:
-                    responsible = _find_responsible_(pred_cell, target_cell, i, j)
+                if target_cell[24] == 1: # if cell has object
+                    responsible = self._find_responsible_(pred_cell, target_cell, i, j)
                     pred_bbox = pred_cell[20:25] if responsible == 0 else pred_cell[25:30]
                     target_bbox = target_cell[20:25]
 
@@ -37,8 +37,8 @@ class Loss(nn.Module):
 
                     # 2. SSE for square roots of width and height
                     # avoid errors with negative predictions
-                    pred_w = pred_bbox[2].abs().sqrt() + 1e-6
-                    pred_h = pred_bbox[3].abs().sqrt() + 1e-6
+                    pred_w = torch.sign(pred_bbox[2]) * (pred_bbox[2].abs() + 1e-6).sqrt()
+                    pred_h = torch.sign(pred_bbox[3]) * (pred_bbox[3].abs() + 1e-6).sqrt()
 
                     loss_2 += (target_bbox[2].sqrt() - pred_w).square() + \
                               (target_bbox[3].sqrt() - pred_h).square()
@@ -47,7 +47,8 @@ class Loss(nn.Module):
                     loss_3 += (target_bbox[4] - pred_bbox[4]).square()
 
                     # 4. SSE for confidences of not responsible bounding box predictors
-                    not_responsible_idx = (responsible + 1) % 2
+                    other_idx = 24 if responsible == 1 else 29
+                    loss_4 += (target_cell[other_idx] - pred_cell[other_idx]).square()
 
                     # 5. SSE for class probabilities
                     for c in list(range(20)):
