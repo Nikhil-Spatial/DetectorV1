@@ -54,7 +54,7 @@ class ImageDataset(Dataset):
         img_filename = self.filenames[idx]
 
         img_path = self.img_dir / img_filename
-        image = decode_image(img_path)
+        image = decode_image(img_path).to(torch.float32) / 255.0 # standardize pixels
 
         objects = self._get_objects(img_filename)
         target_vector = self._create_target_vector(objects)
