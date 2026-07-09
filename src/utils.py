@@ -31,8 +31,11 @@ def IoU(target_bbox: tuple, pred_bbox: tuple, row, col):
     pred = convert_xywh_coords(pred_bbox, row, col, False)
 
     # 2. find intersection box coordinates
-    xmin, ymin = max(target[0], pred[0]), max(target[1], pred[1])
-    xmax, ymax = min(target[2], pred[2]), min(target[3], pred[3])
+    xmin = torch.max(target[0], pred[0])
+    ymin = torch.max(target[1], pred[1])
+    xmax = torch.min(target[2], pred[2])
+    ymax = torch.min(target[3], pred[3])
+    
     inter = (xmin, ymin, xmax, ymax)
 
     # 3. find areas of boxes
