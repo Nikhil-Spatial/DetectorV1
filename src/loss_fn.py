@@ -5,11 +5,6 @@ from uilts import IoU
 class Loss(nn.Module):
     def __init__(self):
         super().__init__()
-        self.loss_fn_1 = CenterLoss()
-        self.loss_fn_2 = WidthHeightLoss()
-        self.loss_fn_3 = ObjectConfidenceLoss()
-        self.loss_fn_4 = NoObjectConfidenceLoss()
-        self.loss_fn_5 = ClassificationLoss()
 
     def _find_responsible_(self, pred_cell, target_cell, row, col):
         """Returns 0 if the first bounding box predictor is responsible for
