@@ -1,5 +1,8 @@
 IMAGE_SIZE = 224
 
+# seed for reproducibility
+SEED = 7
+
 # grid dimensions 7 x 7
 S = 7
 
