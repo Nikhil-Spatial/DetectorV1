@@ -52,6 +52,7 @@ class Model(nn.Module):
 
         # Detector Head
         self.fc_1 = nn.Linear(25_088, 4096)
+        self.dropout = nn.Dropout()
         self.fc_2 = nn.Linear(4096, (C + B * 5) * S * S)
 
     def forward(self, x):
@@ -60,6 +61,6 @@ class Model(nn.Module):
             x = res_block(x)
 
         x = torch.flatten(x, start_dim=1)
-        x = F.relu(self.fc_1(x))
+        x = self.dropout(F.relu(self.fc_1(x)))
         x = self.fc_2(x)
         return x.reshape((S, S, (C + B * 5)))
