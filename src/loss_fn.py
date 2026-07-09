@@ -2,45 +2,7 @@ from configs import LAMBDA_COORD, LAMBDA_NOOBJ, S, B
 from uilts.py import IoU
 import torch.nn as nn
 
-class CenterLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, pred_cell, target_cell, responsible):
-        pred_bbox = pred_cell[20:24] if responsible else pred_cell[25:29]
-        target_bbox = target_cell[20:24]
-
-        return (target_bbox[0])
-
-class WidthHeightLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, pred, target, responsible):
-        pass
-
-class ObjectConfidenceLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, pred, target, responsible):
-        pass
-    
-class NoObjectConfidenceLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, pred, target, responsible):
-        pass
-
-class ClassificationLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-
-    def forward(self, pred, target, responsible):
-        pass
-
-class YOLOLoss(nn.Module):
+class Loss(nn.Module):
     def __init__(self):
         super().__init__()
         self.loss_fn_1 = CenterLoss()
