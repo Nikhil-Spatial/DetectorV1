@@ -6,51 +6,94 @@ class CenterLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, pred, target):
-        pass
+    def forward(self, pred_cell, target_cell, responsible):
+        pred_bbox = pred_cell[20:24] if responsible else pred_cell[25:29]
+        target_bbox = target_cell[20:24]
+
+        return (target_bbox[0])
 
 class WidthHeightLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, pred, target):
+    def forward(self, pred, target, responsible):
         pass
 
 class ObjectConfidenceLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, pred, target):
+    def forward(self, pred, target, responsible):
         pass
     
 class NoObjectConfidenceLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, pred, target):
+    def forward(self, pred, target, responsible):
         pass
 
 class ClassificationLoss(nn.Module):
     def __init__(self):
         super().__init__()
 
-    def forward(self, pred, target):
+    def forward(self, pred, target, responsible):
         pass
 
 class YOLOLoss(nn.Module):
     def __init__(self):
         super().__init__()
+        self.loss_fn_1 = CenterLoss()
+        self.loss_fn_2 = WidthHeightLoss()
+        self.loss_fn_3 = ObjectConfidenceLoss()
+        self.loss_fn_4 = NoObjectConfidenceLoss()
+        self.loss_fn_5 = ClassificationLoss()
 
-    def _find_responsibility_(self, pred, target, row, col):
+    def _find_responsible_(self, pred_cell, target_cell, row, col):
         """Returns 0 if the first bounding box predictor is responsible for
         a prediction, and 1 if the second is responsible."""
-        target_bbox = target[20:24]
-        pred_bbox_1 = target[20:24]
-        pred_bbox_2 = target[25:29]
+        target_bbox = target_cell[20:24]
+        pred_bbox_1 = pred_cell[20:24]
+        pred_bbox_2 = pred_cell[25:29]
 
-        IoU_1 = IoU()
-        IoU_2 = IoU(pred[25:29])
+        IoU_1 = IoU(pred_bbox_1, target_bbox, row, col)
+        IoU_2 = IoU(pred_bbox_2, target_bbox, row, col)
+
+        return 0 if IoU_1 > IoU_2 else 1
 
     def forward(self, pred, target):
+        loss_1 = loss_2 = loss_3 = loss_4 = loss_5 = 0
         for i in list(range(7)):
             for j in list(range(7)):
+                pred_cell = pred[i][j]
+                target_cell = target[i][j]
+
+                if target_cell.any():
+                    responsible = _find_responsible(pred_cell, target_cell, i, j)
+                    pred_bbox = pred_cell[20:25] if responsible else pred_cell[25:30]
+                    target_bbox = target_cell[20:25]
+
+                    # 1. Sum of Squared Errors (SSE) for center points
+                    loss_1 += (target_bbox[0] - pred_bbox[0]).square() + \
+                              (target_bbox[1] - pred_bbox[1]).square()
+
+                    # 2. SSE for square roots of width and height
+                    loss_2 += (target_bbox[2].sqrt() - pred_bbox[2].sqrt()).square() + \
+                              (target_bbox[3].sqrt() - pred_bbox[3].sqrt()).square()
+
+                    # 3. SSE for confidences of cells with objects
+                    loss_3 += (target_bbox[4] - pred_bbox[4]).square()
+
+                    # 5. SSE for class probabilities
+                    for c in list(range(20)):
+                        loss_5 += (target_cell[c] - pred_cell[c]).square()
+
+                else:
+                    # 4. SSE for confidences of cells with no objects
+                    loss_4 += (target_cell[24] - pred_cell[24]).square() + \
+                              (target_cell[29] - pred_cell[29]).square()
+
+        return (LAMBDA_COORD * (loss_1 + loss_2)) + loss_3 + (LAMBDA_NOOBJ * loss_4) + loss_5
+
+
+
