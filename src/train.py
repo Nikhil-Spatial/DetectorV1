@@ -1,3 +1,4 @@
+from transforms import trainval_transforms, test_transforms
 from torch.utils.data import random_split, DataLoader
 from torchvision.transforms import v2
 from pathlib import Path
@@ -12,6 +13,5 @@ img_dir_test = Path("../data/preprocessed/test/Images")
 # 1. Datasets and DataLoaders
 
 
-train_transforms = v2.Compose([])
 
 
