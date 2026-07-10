@@ -14,20 +14,20 @@ def decode_preds(preds_batch):
             for j in range(S):
                 pred_cell = pred[i][j]
 
-                pred_class_idx = pred_cell[:20].argmax().item()
+                pred_class_idx = pred_cell[:C].argmax().item()
                 pred_class_prob = pred_cell[pred_class_idx].item()
                 pred_class = IDX_TO_CLASS[pred_class_idx]
 
-                pred_1_confidence = (pred_cell[24].item() * \
+                pred_1_confidence = (pred_cell[C+4].item() * \
                                      pred_class_prob,)
-                pred_2_confidence = (pred_cell[29].item() * \
+                pred_2_confidence = (pred_cell[C+9].item() * \
                                      pred_class_prob,)
 
-                bbox_1 = convert_xywh_coords(pred_cell[20:24], i, j, False)
-                bbox_2 = convert_xywh_coords(pred_cell[25:29], i, j, False)
+                bbox_1 = convert_xywh_coords(pred_cell[C:C+4], i, j, False)
+                bbox_2 = convert_xywh_coords(pred_cell[C+5:C+9], i, j, False)
 
-                objects.append((pred_class,) + pred_1_confidence + bbox_1)
-                objects.append((pred_class,) + pred_2_confidence + bbox_2)
+                objects.append((pred_class, pred_1_confidence) + bbox_1)
+                objects.append((pred_class, pred_2_confidence) + bbox_2)
 
         decoded_preds.append(objects)
 
@@ -55,7 +55,6 @@ def filter_group_sort_preds(decoded_preds):
             image[class_name].sort(key=itemgetter(1), reverse=True)
 
     return sorted_preds
-
 
 def NMS(preds_batch):
     # 1. decode batch of predictions

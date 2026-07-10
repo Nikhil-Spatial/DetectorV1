@@ -1,4 +1,4 @@
-from src.configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE
+from src.configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, C
 from torchvision.io import decode_image
 from torch.utils.data import Dataset
 import pandas as pd
@@ -38,15 +38,15 @@ class ImageDataset(Dataset):
                 cell[CLASS_TO_IDX[object_[0]]] = 1
 
                 # parameterize bbox x and y to be offsets of cell location
-                cell[20] = cell[25] = (object_[1] - (col * CELL_SIZE)) / CELL_SIZE
-                cell[21] = cell[26] = (object_[2] - (row * CELL_SIZE)) / CELL_SIZE
+                cell[C] = cell[C+5] = (object_[1] - (col * CELL_SIZE)) / CELL_SIZE
+                cell[C+1] = cell[C+6] = (object_[2] - (row * CELL_SIZE)) / CELL_SIZE
 
                 # normalize bbox width and height
-                cell[22] = cell[27] = object_[3] / IMAGE_SIZE
-                cell[23] = cell[28] = object_[4] / IMAGE_SIZE
+                cell[C+2] = cell[C+7] = object_[3] / IMAGE_SIZE
+                cell[C+3] = cell[C+8] = object_[4] / IMAGE_SIZE
 
                 # confidence = 1 for cells containing objects
-                cell[24] = cell[29] = 1
+                cell[C+4] = cell[C+9] = 1
 
         return target_vector
 
