@@ -33,10 +33,10 @@ def decode_preds(preds_batch):
 
     return decoded_preds
 
-def filter_sort(decoded_preds):
+def filter_group_sort_preds(decoded_preds):
     sorted_preds = []
 
-    # 1. filter and sort remaining predictions by class
+    # 1. filter and group remaining predictions by class
     for image in decoded_preds:
         valid_preds = {}
         for pred in image:
