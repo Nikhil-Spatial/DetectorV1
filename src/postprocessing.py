@@ -1,4 +1,5 @@
-from src.configs import S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD
+from src.configs import (S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD,
+                         NMS_IOU_THRESHOLD)
 from src.utils import convert_xywh_coords, IoU
 from operator import itemgetter
 
@@ -77,7 +78,7 @@ def NMS(preds_batch):
                 final_img_preds[class_name].append(highest_conf)
 
                 preds = [pred for pred in preds if
-                         IoU(highest_conf[2:6], pred[2:6]) > NMS_IOU_THRESHOLD]
+                         IoU(highest_conf[2:6], pred[2:6]) < NMS_IOU_THRESHOLD]
 
         final_preds.append(final_img_preds)
 
