@@ -41,7 +41,6 @@ def confidence_threshold(decoded_preds):
             if pred[1] > CONFIDENCE_THRESHOLD:
                 image_preds.append(pred)
 
-        if image_preds:
-            valid_preds.append(image_preds)
-            
+        valid_preds.append(image_preds)
+
     return valid_preds
