@@ -2,7 +2,7 @@ from src.configs import CELL_SIZE, IMAGE_SIZE
 from torch import round as rd
 import torch
 
-def convert_xywh_coords(bbox, row, col, draw: bool):
+def convert_xywh_coords(bbox, row, col, draw: bool, tensor: bool):
     # 1. unnormalize
     x = (bbox[0] * CELL_SIZE) + (col * CELL_SIZE)
     y = (bbox[1] * CELL_SIZE) + (row * CELL_SIZE)
@@ -18,7 +18,12 @@ def convert_xywh_coords(bbox, row, col, draw: bool):
     # 3. if the conversion is for drawing bounding boxes, then round
     if draw:
         return (int(rd(xmin)), int(rd(ymin)), int(rd(xmax)), int(rd(ymax)))
-    return (xmin, ymin, xmax, ymax)
+
+    if tensor:
+        return (xmin.item(), ymin.item(), xmax.item(), ymax.item())
+    else:
+        return (xmin, ymin, xmax, ymax)
+
 
 def area(bbox):
     w = torch.clamp(bbox[2] - bbox[0], min=0)
@@ -48,7 +53,7 @@ def IoU(pred, target, row, col, conversion_needed: bool):
     # 4. compute IoU
     return inter_area / union_area if union_area != 0 else 0
 
-def decode_preds(batch):
-    preds = []
-    for pred in batch:
+# def decode_preds(batch):
+#     preds = []
+#     for pred in batch:
 
