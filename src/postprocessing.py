@@ -18,10 +18,8 @@ def decode_preds(preds_batch):
                 pred_class_prob = pred_cell[pred_class_idx].item()
                 pred_class = IDX_TO_CLASS[pred_class_idx]
 
-                pred_1_confidence = (pred_cell[C+4].item() * \
-                                     pred_class_prob,)
-                pred_2_confidence = (pred_cell[C+9].item() * \
-                                     pred_class_prob,)
+                pred_1_confidence = pred_cell[C+4].item() * pred_class_prob
+                pred_2_confidence = pred_cell[C+9].item() * pred_class_prob
 
                 bbox_1 = convert_xywh_coords(pred_cell[C:C+4], i, j, False)
                 bbox_2 = convert_xywh_coords(pred_cell[C+5:C+9], i, j, False)
