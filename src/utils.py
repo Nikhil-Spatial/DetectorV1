@@ -2,7 +2,7 @@ from src.configs import CELL_SIZE, IMAGE_SIZE, S, B, C
 from torch import round as rd
 import torch
 
-def convert_xywh_coords(bbox, row, col, draw: bool, tensor: bool):
+def convert_xywh_coords(bbox, row, col, draw: bool):
     # 1. unnormalize
     x = (bbox[0] * CELL_SIZE) + (col * CELL_SIZE)
     y = (bbox[1] * CELL_SIZE) + (row * CELL_SIZE)
@@ -20,7 +20,6 @@ def convert_xywh_coords(bbox, row, col, draw: bool, tensor: bool):
         return (int(rd(xmin)), int(rd(ymin)), int(rd(xmax)), int(rd(ymax)))
 
     return (xmin, ymin, xmax, ymax)
-
 
 def area(bbox):
     w = torch.clamp(bbox[2] - bbox[0], min=0)
