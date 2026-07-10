@@ -24,11 +24,11 @@ class Loss(nn.Module):
         batch_size = pred.shape[0]
 
         # compute losses for each image in the batch, total the losses, and then average them
-        for b in list(range(batch_size)):
+        for b in range(batch_size):
             loss_1 = loss_2 = loss_3 = loss_4 = loss_5 = 0
 
-            for i in list(range(S)):
-                for j in list(range(S)):
+            for i in range(S):
+                for j in range(S):
                     pred_cell = pred[b][i][j]
                     target_cell = target[b][i][j]
 
