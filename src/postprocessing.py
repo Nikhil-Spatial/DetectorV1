@@ -73,7 +73,7 @@ def nms(preds_batch):
             final_img_preds[class_name] = []
 
             while preds:
-                highest_conf = preds.pop(0)
+                highest_conf = preds.pop()
                 final_img_preds[class_name].append(highest_conf)
 
                 preds = [pred for pred in preds if
