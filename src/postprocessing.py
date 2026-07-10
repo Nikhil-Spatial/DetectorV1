@@ -1,4 +1,4 @@
-from configs import S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD
+from src.configs import S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD
 from operator import itemgetter
 
 def decode_preds(preds_batch):
@@ -55,3 +55,31 @@ def filter_group_sort_preds(decoded_preds):
             image[class_name].sort(key=itemgetter(1), reverse=True)
 
     return sorted_preds
+
+
+def NMS(preds_batch):
+    # 1. decode batch of predictions
+    decoded_preds = decode_preds(preds_batch)
+
+    # 2. filter, group, and sort the decoded predictions
+    sorted_preds = filter_group_sort_preds(decoded_preds)
+
+    # 3. perform Non-Maximum Suppression
+    final_preds = []
+
+    for image in sorted_preds:
+        final_img_preds = {}
+
+        for class_name, preds in image.items():
+            final_img_preds[class_name] = []
+
+            while preds:
+                highest_conf = preds.pop(0)
+                final_img_preds.append(highest_conf)
+
+                preds = [pred for pred in preds if
+                         IoU(highest_conf, pred) > NMS_IOU_THRESHOLD]
+
+        final_preds.append(final_img_preds)
+
+    return final_preds
