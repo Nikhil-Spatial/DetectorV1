@@ -1,4 +1,4 @@
-from configs import S, C, B, IDX_TO_CLASS
+from configs import S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD
 
 def decode_preds(preds_batch):
     decoded_preds = []
@@ -33,4 +33,15 @@ def decode_preds(preds_batch):
     return decoded_preds
 
 def confidence_threshold(decoded_preds):
-    
+    valid_preds = []
+
+    for image in decoded_preds:
+        image_preds = []
+        for pred in image:
+            if pred[1] > CONFIDENCE_THRESHOLD:
+                image_preds.append(pred)
+
+        if image_preds:
+            valid_preds.append(image_preds)
+            
+    return valid_preds
