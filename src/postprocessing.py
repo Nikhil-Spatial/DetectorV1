@@ -1,4 +1,5 @@
 from configs import S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD
+from operator import itemgetter
 
 def decode_preds(preds_batch):
     decoded_preds = []
@@ -32,15 +33,25 @@ def decode_preds(preds_batch):
 
     return decoded_preds
 
-def confidence_threshold(decoded_preds):
-    valid_preds = []
+def filter_sort(decoded_preds):
+    sorted_preds = []
 
+    # 1. filter and sort remaining predictions by class
     for image in decoded_preds:
-        image_preds = []
+        valid_preds = {}
         for pred in image:
             if pred[1] > CONFIDENCE_THRESHOLD:
-                image_preds.append(pred)
+                class_name = pred[0]
+                if class_name in valid_preds:
+                    valid_preds[class_name].append(pred)
+                else:
+                    valid_preds[class_name] = [pred]
 
-        valid_preds.append(image_preds)
+        sorted_preds.append(valid_preds)
 
-    return valid_preds
+    # 2. sort each class's predictions by confidence score
+    for image in sorted_preds:
+        for class_name in image:
+            image[class_name].sort(key=itemgetter(1), reverse=True)
+
+    return sorted_preds
