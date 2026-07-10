@@ -30,7 +30,7 @@ def area(bbox):
     h = torch.clamp(bbox[3] - bbox[1], min=0)
     return w * h
 
-def IoU(pred, target, row, col, conversion_needed: bool):
+def IoU(pred, target, row=None, col=None, conversion_needed=False):
     # 1. convert (x, y, w, h) to (xmin, ymin, xmax, ymax) --- if needed
     if conversion_needed:
         target = convert_xywh_coords(target, row, col, False)
