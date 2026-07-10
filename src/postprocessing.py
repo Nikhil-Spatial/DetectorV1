@@ -1,4 +1,5 @@
 from src.configs import S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD
+from src.utils import convert_xywh_coords, IoU
 from operator import itemgetter
 
 def decode_preds(preds_batch):
@@ -21,10 +22,8 @@ def decode_preds(preds_batch):
                 pred_2_confidence = (pred_cell[29].item() * \
                                      pred_class_prob,)
 
-                bbox_1 = convert_xywh_coords(pred_cell[20:24], i, j, False,
-                                             True)
-                bbox_2 = convert_xywh_coords(pred_cell[25:29], i, j, False,
-                                             True)
+                bbox_1 = convert_xywh_coords(pred_cell[20:24], i, j, False)
+                bbox_2 = convert_xywh_coords(pred_cell[25:29], i, j, False)
 
                 objects.append((pred_class,) + pred_1_confidence + bbox_1)
                 objects.append((pred_class,) + pred_2_confidence + bbox_2)
@@ -75,10 +74,10 @@ def NMS(preds_batch):
 
             while preds:
                 highest_conf = preds.pop(0)
-                final_img_preds.append(highest_conf)
+                final_img_preds[class_name].append(highest_conf)
 
                 preds = [pred for pred in preds if
-                         IoU(highest_conf, pred) > NMS_IOU_THRESHOLD]
+                         IoU(highest_conf[2:6], pred[2:6]) > NMS_IOU_THRESHOLD]
 
         final_preds.append(final_img_preds)
 

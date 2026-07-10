@@ -19,10 +19,7 @@ def convert_xywh_coords(bbox, row, col, draw: bool, tensor: bool):
     if draw:
         return (int(rd(xmin)), int(rd(ymin)), int(rd(xmax)), int(rd(ymax)))
 
-    if tensor:
-        return (xmin.item(), ymin.item(), xmax.item(), ymax.item())
-    else:
-        return (xmin, ymin, xmax, ymax)
+    return (xmin, ymin, xmax, ymax)
 
 
 def area(bbox):
