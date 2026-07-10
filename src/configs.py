@@ -12,6 +12,8 @@ B = 2
 # number of classes
 C = 20
 
+CONFIDENCE_THRESHOLD = 0.375
+
 # height and width of a single grid cell in pixels
 CELL_SIZE = int(IMAGE_SIZE / S)
 
