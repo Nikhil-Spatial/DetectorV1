@@ -14,8 +14,8 @@ class Loss(nn.Module):
         pred_bbox_1 = pred_cell[20:24]
         pred_bbox_2 = pred_cell[25:29]
 
-        IoU_1 = IoU(pred_bbox_1, target_bbox, row, col)
-        IoU_2 = IoU(pred_bbox_2, target_bbox, row, col)
+        IoU_1 = IoU(pred_bbox_1, target_bbox, row, col, True)
+        IoU_2 = IoU(pred_bbox_2, target_bbox, row, col,  True)
 
         return 0 if IoU_1 > IoU_2 else 1
 

@@ -25,10 +25,11 @@ def area(bbox):
     h = torch.clamp(bbox[3] - bbox[1], min=0)
     return w * h
 
-def IoU(pred_bbox, target_bbox, row, col):
-    # 1. convert (x, y, w, h) to (xmin, ymin, xmax, ymax)
-    target = convert_xywh_coords(target_bbox, row, col, False)
-    pred = convert_xywh_coords(pred_bbox, row, col, False)
+def IoU(pred, target, row, col, conversion_needed: bool):
+    # 1. convert (x, y, w, h) to (xmin, ymin, xmax, ymax) --- if needed
+    if conversion_needed:
+        target = convert_xywh_coords(target, row, col, False)
+        pred = convert_xywh_coords(pred, row, col, False)
 
     # 2. find intersection box coordinates
     xmin = torch.max(target[0], pred[0])
@@ -50,4 +51,4 @@ def IoU(pred_bbox, target_bbox, row, col):
 def decode_preds(batch):
     preds = []
     for pred in batch:
-        
+
