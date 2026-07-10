@@ -64,14 +64,22 @@ def decode_preds(preds_batch):
             for j in range(S):
                 pred_cell = pred[i][j]
 
-                bbox_1 = convert_xywh_coords(pred_cell[20:24], i, j, False, True)
-                bbox_2 = convert_xywh_coords(pred_cell[25:29], i, j, False, True)
+                pred_class_idx = pred_cell[:20].argmax().item()
+                pred_class_prob = pred_cell[pred_class_idx].item()
+                pred_class = IDX_TO_CLASS[pred_class_idx]
 
-                pred_1_confidence = (pred_cell[24].item(),)
-                pred_2_confidence = (pred_cell[29].item(),)
+                pred_1_confidence = (pred_cell[24].item() * \
+                                     pred_class_prob,)
+                pred_2_confidence = (pred_cell[29].item() * \
+                                     pred_class_prob,)
 
-                objects.append(bbox_1 + pred_1_confidence)
-                objects.append(bbox_2 + pred_2_confidence)
+                bbox_1 = convert_xywh_coords(pred_cell[20:24], i, j, False,
+                                             True)
+                bbox_2 = convert_xywh_coords(pred_cell[25:29], i, j, False,
+                                             True)
+
+                objects.append((pred_class,) + pred_1_confidence + bbox_1)
+                objects.append((pred_class,) + pred_2_confidence + bbox_2)
 
         decoded_preds.append(objects)
 
