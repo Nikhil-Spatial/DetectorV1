@@ -52,11 +52,11 @@ def filter_group_sort_preds(decoded_preds):
     # 2. sort each class's predictions by confidence score
     for image in sorted_preds:
         for class_name in image:
-            image[class_name].sort(key=itemgetter(1), reverse=True)
+            image[class_name].sort(key=itemgetter(1))
 
     return sorted_preds
 
-def NMS(preds_batch):
+def nms(preds_batch):
     # 1. decode batch of predictions
     decoded_preds = decode_preds(preds_batch)
 
