@@ -1,4 +1,4 @@
-from src.configs import CELL_SIZE, IMAGE_SIZE
+from src.configs import CELL_SIZE, IMAGE_SIZE, S, B, C
 from torch import round as rd
 import torch
 
@@ -53,7 +53,26 @@ def IoU(pred, target, row, col, conversion_needed: bool):
     # 4. compute IoU
     return inter_area / union_area if union_area != 0 else 0
 
-# def decode_preds(batch):
-#     preds = []
-#     for pred in batch:
+def decode_preds(preds_batch):
+    decoded_preds = []
 
+    for pred in preds_batch:
+        pred = pred.reshape((S, S, C + B * 5))
+        objects = []
+
+        for i in range(S):
+            for j in range(S):
+                pred_cell = pred[i][j]
+
+                bbox_1 = convert_xywh_coords(pred_cell[20:24], i, j, False, True)
+                bbox_2 = convert_xywh_coords(pred_cell[25:29], i, j, False, True)
+
+                pred_1_confidence = (pred_cell[24].item(),)
+                pred_2_confidence = (pred_cell[29].item(),)
+
+                objects.append(bbox_1 + pred_1_confidence)
+                objects.append(bbox_2 + pred_2_confidence)
+
+        decoded_preds.append(objects)
+
+    return decoded_preds
