@@ -46,3 +46,8 @@ def IoU(pred_bbox, target_bbox, row, col):
 
     # 4. compute IoU
     return inter_area / union_area if union_area != 0 else 0
+
+def decode_preds(batch):
+    preds = []
+    for pred in batch:
+        

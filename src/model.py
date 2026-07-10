@@ -1,7 +1,7 @@
 import torch.nn.functional as F
 import torch.nn as nn
 import torch
-from configs import S, B, C
+from src.configs import S, B, C
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride):
@@ -62,5 +62,4 @@ class Model(nn.Module):
 
         x = torch.flatten(x, start_dim=1)
         x = self.dropout(F.relu(self.fc_1(x)))
-        x = self.fc_2(x)
-        return x.reshape((S, S, (C + B * 5)))
+        return self.fc_2(x)
