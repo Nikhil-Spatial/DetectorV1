@@ -44,13 +44,18 @@ loss_history, train_mAP_history, val_mAP_history = [], [], []
 
 for epoch in range(epochs):
     # 1. Train Model
-    epoch_loss = train(model, loss_fn, optimizer, train_dl, device)
-    loss_history.append(epoch_loss)
+    loss = train(model, loss_fn, optimizer, train_dl, device)
+    loss_history.append(loss)
+    lr_scheduler.step()
 
     # 2. Evaluate on Training Data
+    train_mAP, _, _ = compute_accuracy(model, train_dl, device)
+    train_mAP_history.append(train_mAP)
 
+    # 3. Evaluate on Validation Data
+    val_mAP, _, _ = compute_accuracy(model, val_dl, device)
+    val_mAP_history.append(val_mAP)
 
-
-
-
-
+    # 4. Display Statistics
+    print(f"Epoch {epoch+1}: Loss - {loss} | mAP on Training Set - {train_mAP} "
+          f"| mAP on Validation Set - {val_mAP}")
