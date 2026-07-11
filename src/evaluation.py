@@ -63,8 +63,13 @@ def tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
         for class_name, object_list in objects.items():
             class_object_totals[class_name] += len(object_list)
 
-def mean_average_precision(all_tp_fp_by_class, class_object_totals,
-                           precision_recall_lists):
+def mean_average_precision(final_preds, truth_objects, all_tp_fp_by_class,
+                           class_object_totals, precision_recall_lists):
+    # 1. Find TP/FPs and Count Total Number of Objects Per Class
+    tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
+                            class_object_totals)
+
+    # 2. Compute AP for each class and mAP for overall dataset
     ap_by_class = {}
 
     for class_name, tp_fp_list in all_tp_fp_by_class.items():
