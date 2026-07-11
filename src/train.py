@@ -1,8 +1,7 @@
+from train_test_functions import train, compute_loss_accuracy, plot_history
 from transforms import trainval_transforms, test_transforms
-from train_test_functions import train, compute_accuracy, plot_history
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
-from transforms import trainval_transforms, test_transforms
 from dataset import ImageDataset
 from loss_fn.py import Loss
 from model.py import Model
