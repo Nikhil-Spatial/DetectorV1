@@ -29,14 +29,14 @@ val_dl = DataLoader(val_dataset, batch_size=32)
 test_dl = DataLoader(test_dataset, batch_size=32)
 
 # 2. Instantiate model, loss, etc.
+device = "cuda" if torch.cuda.is_available() else "cpu"
+num_epochs = 75
+
 model = Model()
 loss_fn = Loss()
 
 optimizer = torch.optim.SGD(model.parameters(), 1e-2, 0.9, weight_decay=0.0005)
-scheduler = CosineAnnealingLR(optimizer, eta_min=1e-4)
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
-num_epochs = 75
+scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs+1, eta_min=1e-4)
 
 # 3. Training Loop
 checkpoint_dir = Path("../outputs/checkpoints")
@@ -45,7 +45,7 @@ checkpoint_dir.mkdir(parents=True, exist_ok=True)
 train_loss_history, val_loss_history = [], []
 train_mAP_history, val_mAP_history = [], []
 
-for epoch in range(1, epochs + 1):
+for epoch in range(1, num_epochs + 1):
     # 1. Train Model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
     train_loss_history.append(loss)
