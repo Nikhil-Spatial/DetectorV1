@@ -61,4 +61,5 @@ def compute_accuracy(model, dl, device):
         final_preds = nms(preds)
         ground_truth_objects = find_objects_in_target(y_batch, device)
 
-        # 3.
+        # 3. Evaluation
+        mAP, ap_by_class = map(final_preds, ground_truth_objects, )
