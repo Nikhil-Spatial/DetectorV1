@@ -16,6 +16,8 @@ CONFIDENCE_THRESHOLD = 0.375
 
 NMS_IOU_THRESHOLD = 0.5
 
+mAP_IOU_THRESHOLD = 0.5
+
 # height and width of a single grid cell in pixels
 CELL_SIZE = int(IMAGE_SIZE / S)
 
