@@ -1,3 +1,6 @@
+from evaluation import compute_map, find_objects_in_target
+from postprocessing import nms
+
 def train(model, loss_fn, optimizer, train_dl, device):
     model.train()
     total_loss = 0
@@ -50,7 +53,7 @@ def compute_accuracy(model, dl, device):
         "tvmonitor": ([], []),
     }
 
-    for X_batch, y_batch in train_dl:
+    for X_batch, y_batch in dl:
         X_batch = X_batch.to(device)
         y_batch = y_batch.to(device)
 
@@ -62,4 +65,7 @@ def compute_accuracy(model, dl, device):
         ground_truth_objects = find_objects_in_target(y_batch, device)
 
         # 3. Evaluation
-        mAP, ap_by_class = map(final_preds, ground_truth_objects, )
+        mAP, ap_by_class = compute_map(final_preds, ground_truth_objects,
+                                       precision_recall_lists)
+
+    return precision_recall_lists
