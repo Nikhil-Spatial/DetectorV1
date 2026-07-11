@@ -26,7 +26,9 @@ def find_objects_in_target(y_batch, device):
 
     return truth_objects
 
-def find_tp_fp(final_preds, truth_objects, all_tp_fp_by_class):
+
+def tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
+                            class_object_totals):
     # 1. iterate through each image prediction/label in the batch
     for b in range(len(final_preds)):
         img_preds = final_preds[b]
@@ -34,7 +36,7 @@ def find_tp_fp(final_preds, truth_objects, all_tp_fp_by_class):
 
         # 2. iterate through each class
         for class_name, preds in img_preds.items():
-            # 3. if any of the ground truth objects belong to the class
+            # a. if any of the ground truth objects belong to the class
             if class_name in objects:
                 # iterate through each prediction, find max IoU truth object, and
                 # if the max IoU surpasses the threshold, it is a TP, else FP
@@ -53,7 +55,11 @@ def find_tp_fp(final_preds, truth_objects, all_tp_fp_by_class):
                     else:
                         all_tp_fp_by_class[class_name].append((pred[1], False))
             else:
-                # all predictions belonging to class are FP since there are
+                # b. all predictions belonging to class are FP since there are
                 # no ground truth objects belonging to that class
                 for pred in preds:
                     all_tp_fp_by_class[class_name].append((pred[1], False))
+
+                    # 3. add the number of objects that belong to each class to the total
+        for class_name, object_list in objects.items():
+            class_object_totals[class_name] += len(object_list)
