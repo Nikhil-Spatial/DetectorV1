@@ -80,3 +80,23 @@ def nms(preds_batch):
         final_preds.append(final_img_preds)
 
     return final_preds
+
+def find_objects(y_batch):
+    y_batch = y_batch.flatten(1, 2)
+    objects = []
+
+    for target in y_batch:
+        class_objects = {}
+
+        for cell in target:
+            class_name = IDX_TO_CLASS[int(torch.argmax(cell[:C]))]
+
+            if cell[C + 4] == 1:
+                if class_name in class_objects:
+                    class_objects[class_name].append(cell[C:C + 10])
+                else:
+                    class_objects[class_name] = [cell[C:C + 10]]
+
+        objects.append(class_objects)
+
+    return objects
