@@ -2,6 +2,7 @@ from evaluation import (compute_map, find_objects_in_target,
                         tp_fp_and_count_objects)
 from postprocessing import nms
 from loss_fn import Loss
+from pathlib import Path
 
 def train(model, loss_fn, optimizer, train_dl, device):
     model.train()
@@ -135,3 +136,17 @@ def compute_loss_accuracy(model, dl, device):
     avg_val_loss = total_val_loss / len(dl)
 
     return mAP, avg_val_loss, ap_by_class, precision_recall_lists,
+
+def plot_history(num_epochs, history, hist_type: str):
+    fig, ax = plt.subplots(1, figsize=(5, 5 ))
+    epoch_range = list(range(1, num_epochs + 1))
+
+    axes[0].plot(epoch_range, history, c='k')
+    axes[0].set_title(f"{hist_type} History")
+    axes[0].set_xlabel("Epochs")
+    axes[0].set_ylabel(hist_type)
+
+    plot_dir = Path(f"../outputs/plots/{hist_type}_history")
+    plot_dir.mkdir(parents=True, exist_ok=True)
+
+    fig.savefig(plot_dir / f"{hist_type} plot.png")
