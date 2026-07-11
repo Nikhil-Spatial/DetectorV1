@@ -1,5 +1,5 @@
 from transforms import trainval_transforms, test_transforms
-from train_functions import train, compute_accuracy
+from train_test_functions import train, compute_accuracy
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 from dataset import ImageDataset
@@ -31,7 +31,7 @@ model = Model()
 loss_fn = Loss()
 
 optimizer = torch.optim.SGD(model.parameters(), 1e-2, 0.9, weight_decay=0.0005)
-lr_scheduler = CosineAnnealingLR(optimizer, eta_min=1e-4)
+scheduler = CosineAnnealingLR(optimizer, eta_min=1e-4)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 num_epochs = 75
@@ -40,22 +40,35 @@ num_epochs = 75
 checkpoint_dir = Path("../outputs/checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-loss_history, train_mAP_history, val_mAP_history = [], [], []
+train_loss_history, val_loss_history = [], []
+train_mAP_history, val_mAP_history = [], []
 
-for epoch in range(epochs):
+for epoch in range(1, epochs + 1):
     # 1. Train Model
-    loss = train(model, loss_fn, optimizer, train_dl, device)
-    loss_history.append(loss)
-    lr_scheduler.step()
+    train_loss = train(model, loss_fn, optimizer, train_dl, device)
+    train_loss_history.append(loss)
+    scheduler.step()
 
     # 2. Evaluate on Training Data
-    train_mAP, _, _ = compute_accuracy(model, train_dl, device)
+    train_mAP, _, _, _ = compute_accuracy(model, train_dl, device)
     train_mAP_history.append(train_mAP)
 
     # 3. Evaluate on Validation Data
-    val_mAP, _, _ = compute_accuracy(model, val_dl, device)
+    val_mAP, val_loss, _, _ = compute_accuracy(model, val_dl, device)
+    val_loss_history.append(val_loss)
     val_mAP_history.append(val_mAP)
 
     # 4. Display Statistics
-    print(f"Epoch {epoch+1}: Loss - {loss} | mAP on Training Set - {train_mAP} "
-          f"| mAP on Validation Set - {val_mAP}")
+    print(f"(Epoch {epoch}) Training: Loss - {train_loss} mAP - {train_mAP} | "
+          f"Validation: Loss - {val_loss} mAP - {val_mAP}")
+
+    if epoch % 5 == 0:
+        checkpoint = {
+            "epoch": epoch,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "val_loss": val_loss,
+            "scheduler_state_dict": scheduler.state_dict()
+        }
+
+        torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch}.pth")

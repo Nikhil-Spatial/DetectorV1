@@ -1,6 +1,7 @@
 from evaluation import (compute_map, find_objects_in_target,
                         tp_fp_and_count_objects)
 from postprocessing import nms
+from loss_fn import Loss
 
 def train(model, loss_fn, optimizer, train_dl, device):
     model.train()
@@ -14,7 +15,7 @@ def train(model, loss_fn, optimizer, train_dl, device):
         preds = model(X_batch)
 
         # 2. Compute Loss
-        loss = loss_fn(preds, y_batch)
+        loss = Loss(preds, y_batch)
 
         # 3. Reset Gradients
         optimizer.zero_grad()
@@ -29,8 +30,7 @@ def train(model, loss_fn, optimizer, train_dl, device):
 
     return total_loss / len(train_dl) # returns average loss
 
-def compute_accuracy(model, dl, device):
-    model.eval()
+def compute_loss_accuracy(model, dl, device):
     # every class is associated with a tuple that contains two lists
     # list 1 contains precision scores, and list 2 recall
     precision_recall_lists = {
@@ -107,22 +107,31 @@ def compute_accuracy(model, dl, device):
         "tvmonitor": 0,
     }
 
-    for X_batch, y_batch in dl:
-        X_batch = X_batch.to(device)
-        y_batch = y_batch.to(device)
+    model.eval()
+    total_val_loss = 0
 
-        # 1. Forward Pass
-        preds = model(X_batch)
+    while torch.no_grad():
+        for X_batch, y_batch in dl:
+            X_batch = X_batch.to(device)
+            y_batch = y_batch.to(device)
 
-        # 2. Postprocess
-        final_preds = nms(preds)
-        ground_truth_objects = find_objects_in_target(y_batch, device)
+            # 1. Forward Pass
+            preds = model(X_batch)
 
-        # 3. Find TP/FP and count total objects per class
-        tp_fp_and_count_objects(final_preds, ground_truth_objects,
-                                all_tp_fp_by_class, class_object_totals)
+            # 2. Compute Validation Loss
+            val_loss = Loss(preds, y_batch)
+            total_val_loss += val_loss.item()
+
+            # 3. Postprocess
+            final_preds = nms(preds)
+            ground_truth_objects = find_objects_in_target(y_batch, device)
+
+            # 4. Find TP/FP and count total objects per class
+            tp_fp_and_count_objects(final_preds, ground_truth_objects,
+                                    all_tp_fp_by_class, class_object_totals)
 
     mAP, ap_by_class = compute_map(all_tp_fp_by_class, class_object_totals,
                                    precision_recall_lists)
+    avg_val_loss = total_val_loss / len(dl)
 
-    return mAP, ap_by_class, precision_recall_lists
+    return mAP, avg_val_loss, ap_by_class, precision_recall_lists,
