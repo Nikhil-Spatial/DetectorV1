@@ -80,28 +80,3 @@ def nms(preds_batch):
         final_preds.append(final_img_preds)
 
     return final_preds
-
-
-def find_objects(y_batch, device):
-    y_batch = y_batch.flatten(1, 2)
-    truth_objects = []
-
-    for target in y_batch:
-        class_objects = {}
-
-        for cell in target:
-            class_name = IDX_TO_CLASS[int(torch.argmax(cell[:C]))]
-
-            if cell[C + 4] == 1:
-                # the additional 0 is to classify that specific object as
-                # unmatched with a prediction. 1 is for matched.
-                bboxes = torch.cat(
-                    (cell[C:C + 4], torch.tensor([0]).to(device)))
-                if class_name in class_objects:
-                    class_objects[class_name].append(bboxes)
-                else:
-                    class_objects[class_name] = [bboxes]
-
-        truth_objects.append(class_objects)
-
-    return truth_objects
