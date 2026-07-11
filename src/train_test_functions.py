@@ -1,7 +1,7 @@
 from evaluation import (compute_map, find_objects_in_target,
                         tp_fp_and_count_objects)
 from postprocessing import nms
-from loss_fn import Loss
+from loss_function import Loss
 from pathlib import Path
 
 def train(model, loss_fn, optimizer, train_dl, device):
@@ -16,7 +16,7 @@ def train(model, loss_fn, optimizer, train_dl, device):
         preds = model(X_batch)
 
         # 2. Compute Loss
-        loss = Loss(preds, y_batch)
+        loss = loss_fn(preds, y_batch)
 
         # 3. Reset Gradients
         optimizer.zero_grad()
@@ -120,7 +120,7 @@ def compute_loss_accuracy(model, dl, device):
             preds = model(X_batch)
 
             # 2. Compute Validation Loss
-            val_loss = Loss(preds, y_batch)
+            val_loss = Loss()(preds, y_batch)
             total_val_loss += val_loss.item()
 
             # 3. Postprocess
