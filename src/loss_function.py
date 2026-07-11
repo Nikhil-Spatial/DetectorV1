@@ -21,7 +21,7 @@ class Loss(nn.Module):
 
     def forward(self, pred, target):
         total_loss = 0
-        batch_size = pred.shape[0]
+        batch_size = pred.shape[0].item()
 
         # compute losses for each image in the batch, total the losses, and then average them
         for b in range(batch_size):
