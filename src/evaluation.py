@@ -63,59 +63,8 @@ def tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
         for class_name, object_list in objects.items():
             class_object_totals[class_name] += len(object_list)
 
-# computes mAP (Mean Average Precision)
-def compute_map(final_preds, truth_objects, precision_recall_lists):
-    # 1. Find TP/FPs and Count Total Number of Objects Per Class
-    all_tp_fp_by_class = {
-        "aeroplane": [],
-        "bicycle": [],
-        "bird": [],
-        "boat": [],
-        "bottle": [],
-        "bus": [],
-        "car": [],
-        "cat": [],
-        "chair": [],
-        "cow": [],
-        "diningtable": [],
-        "dog": [],
-        "horse": [],
-        "motorbike": [],
-        "person": [],
-        "pottedplant": [],
-        "sheep": [],
-        "sofa": [],
-        "train": [],
-        "tvmonitor": [],
-    }
-
-    class_object_totals = {
-        "aeroplane": 0,
-        "bicycle": 0,
-        "bird": 0,
-        "boat": 0,
-        "bottle": 0,
-        "bus": 0,
-        "car": 0,
-        "cat": 0,
-        "chair": 0,
-        "cow": 0,
-        "diningtable": 0,
-        "dog": 0,
-        "horse": 0,
-        "motorbike": 0,
-        "person": 0,
-        "pottedplant": 0,
-        "sheep": 0,
-        "sofa": 0,
-        "train": 0,
-        "tvmonitor": 0,
-    }
-
-    tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
-                            class_object_totals)
-
-    # 2. Compute AP for each class and mAP for overall dataset
+def compute_map(all_tp_fp_by_class, class_object_totals,
+                precision_recall_lists):
     ap_by_class = {}
 
     for class_name, tp_fp_list in all_tp_fp_by_class.items():

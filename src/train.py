@@ -1,4 +1,5 @@
 from transforms import trainval_transforms, test_transforms
+from train_functions import train, compute_accuracy
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 from dataset import ImageDataset
@@ -39,15 +40,15 @@ num_epochs = 75
 checkpoint_dir = Path("../outputs/checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-loss_history, train_acc_history, val_acc_history = [], [], []
-
-
+loss_history, train_mAP_history, val_mAP_history = [], [], []
 
 for epoch in range(epochs):
     # 1. Train Model
-    model.train()
+    epoch_loss = train(model, loss_fn, optimizer, train_dl, device)
+    loss_history.append(epoch_loss)
 
-    for image, target in
+    # 2. Evaluate on Training Data
+
 
 
 
