@@ -26,7 +26,6 @@ def find_objects_in_target(y_batch, device):
 
     return truth_objects
 
-
 def tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
                             class_object_totals):
     # 1. iterate through each image prediction/label in the batch
@@ -60,6 +59,52 @@ def tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
                 for pred in preds:
                     all_tp_fp_by_class[class_name].append((pred[1], False))
 
-                    # 3. add the number of objects that belong to each class to the total
+        # 3. add the number of objects that belong to each class to the total
         for class_name, object_list in objects.items():
             class_object_totals[class_name] += len(object_list)
+
+def mean_average_precision(all_tp_fp_by_class, class_object_totals,
+                           precision_recall_lists):
+    ap_by_class = {}
+
+    for class_name, tp_fp_list in all_tp_fp_by_class.items():
+        if class_object_totals[class_name] == 0:
+            continue
+
+        AP = 0
+
+        # 1. sort every list of TP/FPs in each class
+        tp_fp_list.sort(key=itemgetter(0), reverse=True)
+
+        # 2. iterate through list of TP/FPs and compute precision/recall
+        true_positives = 0
+
+        precision_denom = 0  # denominator - <total TP or FP>
+        recall_denom = class_object_totals[
+            class_name]  # denominator - <total objects in class>
+
+        previous_recall = 0
+
+        precision_list = precision_recall_lists[class_name][0]
+        recall_list = precision_recall_lists[class_name][1]
+
+        for _, status in tp_fp_list:
+            true_positives += status
+            precision_denom += 1
+
+            precision = true_positives / precision_denom
+            recall = true_positives / recall_denom
+
+            precision_list.append(precision)
+            recall_list.append(recall)
+
+            delta_recall = recall - previous_recall
+            AP += precision * delta_recall
+
+            previous_recall = recall
+
+        ap_by_class[class_name] = AP
+
+    mAP = sum(ap_by_class.values()) / len(ap_by_class)
+
+    return mAP, ap_by_class
