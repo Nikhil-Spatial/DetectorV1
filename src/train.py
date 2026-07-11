@@ -2,6 +2,7 @@ from transforms import trainval_transforms, test_transforms
 from train_test_functions import train, compute_accuracy, plot_history
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
+from transforms import trainval_transforms, test_transforms
 from dataset import ImageDataset
 from loss_fn.py import Loss
 from model.py import Model
@@ -16,8 +17,10 @@ annot_file_test = Path("../data/preprocessed/test/annotations.csv")
 img_dir_test = Path("../data/preprocessed/test/Images")
 
 # 1. Datasets and DataLoaders
-trainval_dataset = ImageDataset(annot_file_trainval, img_dir_trainval)
-test_dataset = ImageDataset(annot_file_test, img_dir_test)
+trainval_dataset = ImageDataset(annot_file_trainval, img_dir_trainval,
+                                transform=trainval_transforms)
+test_dataset = ImageDataset(annot_file_test, img_dir_test,
+                            transform=test_transforms)
 
 generator1 = torch.Generator().manual_seed(SEED)
 train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2])

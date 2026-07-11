@@ -1,4 +1,5 @@
 from torchvision.transforms import v2
+import torch.nn as nn
 
 TRAINVAL_MEANS = (0.4485, 0.4249, 0.3922)
 TRAINVAL_STDS = (0.2682, 0.2655, 0.2782)
