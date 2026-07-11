@@ -3,10 +3,10 @@ from transforms import trainval_transforms, test_transforms
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 from dataset import ImageDataset
-from loss_fn.py import Loss
-from model.py import Model
+from loss_fn import Loss
 from pathlib import Path
 from configs import SEED
+from model import Model
 import torch
 
 annot_file_trainval = Path("../data/preprocessed/trainval/annotations.csv")
