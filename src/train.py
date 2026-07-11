@@ -1,5 +1,5 @@
 from transforms import trainval_transforms, test_transforms
-from train_test_functions import train, compute_accuracy
+from train_test_functions import train, compute_accuracy, plot_history
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 from dataset import ImageDataset
@@ -72,3 +72,9 @@ for epoch in range(1, epochs + 1):
         }
 
         torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch}.pth")
+
+# plot all the lists of histories
+plot_history(epochs, train_loss_history, "training_loss")
+plot_history(epochs, val_loss_history, "val_loss")
+plot_history(epochs, train_mAP_history, "training_mAP")
+plot_history(epochs, val_mAP_history, "val_mAP")
