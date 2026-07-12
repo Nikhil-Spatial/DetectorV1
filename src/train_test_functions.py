@@ -3,6 +3,7 @@ from evaluation import (compute_map, find_objects_in_target,
 from matplotlib import pyplot as plt
 from postprocessing import nms
 from pathlib import Path
+import torch
 
 def train(model, loss_fn, optimizer, train_dl, device):
     model.train()
