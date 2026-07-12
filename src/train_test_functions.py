@@ -4,13 +4,13 @@ from matplotlib import pyplot as plt
 from postprocessing import nms
 from pathlib import Path
 
-def train(model, loss_fn, optimizer, train_dl):
+def train(model, loss_fn, optimizer, train_dl, device):
     model.train()
     total_loss = 0
 
     for X_batch, y_batch in train_dl:
-        X_batch = X_batch
-        y_batch = y_batch
+        X_batch = X_batch.to(device)
+        y_batch = y_batch.to(device)
 
         # 1. Forward Pass
         preds = model(X_batch)

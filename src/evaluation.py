@@ -2,7 +2,7 @@ from configs import C, TP_IOU_THRESHOLD
 from utils import IoU
 import torch
 
-def find_objects_in_target(y_batch, device):
+def find_objects_in_target(y_batch):
     y_batch = y_batch.flatten(1, 2)
     truth_objects = []
 
@@ -16,7 +16,7 @@ def find_objects_in_target(y_batch, device):
                 # the additional 0 is to classify that specific object as
                 # unmatched with a prediction. 1 is for matched.
                 bboxes = torch.cat(
-                    (cell[C:C + 4], torch.tensor([0]).to(device)))
+                    (cell[C:C + 4], torch.tensor([0])))
                 if class_name in class_objects:
                     class_objects[class_name].append(bboxes)
                 else:
