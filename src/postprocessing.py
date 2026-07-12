@@ -61,6 +61,8 @@ def nms(preds_batch):
     # 2. filter, group, and sort the decoded predictions
     sorted_preds = filter_group_sort_preds(decoded_preds)
 
+    print(f"Sorted Preds: {sorted_preds}")
+
     # 3. perform Non-Maximum Suppression
     final_preds = []
 
@@ -78,5 +80,7 @@ def nms(preds_batch):
                          IoU(highest_conf[2:6], pred[2:6]) < NMS_IOU_THRESHOLD]
 
         final_preds.append(final_img_preds)
+
+    print(f"Final Preds: {final_preds}")
 
     return final_preds
