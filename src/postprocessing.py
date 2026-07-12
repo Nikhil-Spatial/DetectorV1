@@ -61,7 +61,7 @@ def nms(preds_batch):
     # 2. filter, group, and sort the decoded predictions
     sorted_preds = filter_group_sort_preds(decoded_preds)
 
-    print(f"Sorted Preds: {sorted_preds}")
+    print(f"Sorted Preds: {len(sorted_preds)} {len(sorted_preds[0])} {len(sorted_preds[0]["bird"])} {sorted_preds}")
 
     # 3. perform Non-Maximum Suppression
     final_preds = []

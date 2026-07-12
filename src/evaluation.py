@@ -3,35 +3,6 @@ from operator import itemgetter
 from utils import IoU, convert_xywh_coords
 import torch
 
-def find_objects_in_target(y_batch):
-    truth_objects = []
-
-    for b in range(y_batch.shape[0]):
-        class_objects = {}
-
-        for i in range(S):
-            for j in range(S):
-                cell = y_batch[b][i][j]
-                class_name = IDX_TO_CLASS[int(torch.argmax(cell[:C]))]
-
-                if cell[C + 4] == 1:
-                    # convert targets from (x, y, w, h) to (x1, y1, x2, y2)
-                    bbox = torch.tensor(
-                        convert_xywh_coords(cell[C:C + 4], i, j, False))
-
-                    # the additional 0 is to classify that specific object as
-                    # unmatched with a prediction. 1 is for matched.
-                    bbox = torch.cat((bbox, torch.tensor([0])))
-
-                    if class_name in class_objects:
-                        class_objects[class_name].append(bbox)
-                    else:
-                        class_objects[class_name] = [bbox]
-
-        truth_objects.append(class_objects)
-
-    return truth_objects
-
 def tp_fp_and_count_objects(final_preds, truth_objects, all_tp_fp_by_class,
                             class_object_totals):
     # 1. iterate through each image prediction/label in the batch

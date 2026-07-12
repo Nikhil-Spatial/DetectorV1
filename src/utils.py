@@ -1,4 +1,4 @@
-from src.configs import CELL_SIZE, IMAGE_SIZE, S, B, C
+from src.configs import CELL_SIZE, IMAGE_SIZE, S, B, C, IDX_TO_CLASS
 from torch import round as rd
 import torch
 
@@ -48,3 +48,36 @@ def IoU(bbox_1, bbox_2, row=None, col=None, conversion_needed=False):
 
     # 4. compute IoU
     return inter_area / union_area if union_area != 0 else 0
+
+def find_objects_in_target(y_batch, nms: bool):
+    truth_objects_by_img = []
+    batch_size = y_batch.shape[0]
+
+    for b in range(batch_size):
+        objects_by_class = {}
+
+        for i in range(S):
+            for j in range(S):
+                cell = y_batch[b][i][j]
+
+                class_idx = int(torch.argmax(cell[:C]))
+                class_name = IDX_TO_CLASS[class_idx]
+
+                # if the cell contains the center of an object
+                if cell[C + 4] == 1:
+                    # convert targets from (x, y, w, h) to (x1, y1, x2, y2)
+                    bbox = convert_xywh_coords(cell[C:C + 4], i, j, True) # CHANGED DRAW TO TRUE FOR TESTING PURPOSES *** CHANGE THIS ***
+
+                    # the additional 0 is to classify that specific object as
+                    # unmatched with a prediction for NMS. 1 is for matched.
+                    if nms:
+                        bbox = torch.cat((bbox, torch.tensor([0])))
+
+                    if class_name in objects_by_class:
+                        objects_by_class[class_name].append(bbox)
+                    else:
+                        objects_by_class[class_name] = [bbox]
+
+        truth_objects_by_img.append(objects_by_class)
+
+    return truth_objects_by_img

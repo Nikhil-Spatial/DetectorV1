@@ -53,7 +53,7 @@ class Model(nn.Module):
         # Detector Head
         self.fc_1 = nn.Linear(25_088, 4096)
         self.dropout = nn.Dropout()
-        self.fc_2 = nn.Linear(4096, (C + B * 5) * S * S)
+        self.fc_2 = nn.Linear(4096, S, S, (C + B * 5))
 
     def forward(self, x):
         x = F.relu(self.conv_1(x))
