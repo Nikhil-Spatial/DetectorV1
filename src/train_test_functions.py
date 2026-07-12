@@ -1,16 +1,16 @@
 from evaluation import (compute_map, find_objects_in_target,
                         tp_fp_and_count_objects)
+from matplotlib import pyplot as plt
 from postprocessing import nms
-from loss_function import Loss
 from pathlib import Path
 
-def train(model, loss_fn, optimizer, train_dl, device):
+def train(model, loss_fn, optimizer, train_dl):
     model.train()
     total_loss = 0
 
     for X_batch, y_batch in train_dl:
-        X_batch = X_batch.to(device)
-        y_batch = y_batch.to(device)
+        X_batch = X_batch
+        y_batch = y_batch
 
         # 1. Forward Pass
         preds = model(X_batch)
@@ -31,7 +31,7 @@ def train(model, loss_fn, optimizer, train_dl, device):
 
     return total_loss / len(train_dl) # returns average loss
 
-def compute_loss_accuracy(model, dl, device):
+def compute_loss_accuracy(model, loss_fn, dl, device):
     # every class is associated with a tuple that contains two lists
     # list 1 contains precision scores, and list 2 recall
     precision_recall_lists = {
@@ -111,7 +111,7 @@ def compute_loss_accuracy(model, dl, device):
     model.eval()
     total_val_loss = 0
 
-    while torch.no_grad():
+    with torch.no_grad():
         for X_batch, y_batch in dl:
             X_batch = X_batch.to(device)
             y_batch = y_batch.to(device)
@@ -120,12 +120,15 @@ def compute_loss_accuracy(model, dl, device):
             preds = model(X_batch)
 
             # 2. Compute Validation Loss
-            val_loss = Loss()(preds, y_batch)
+            val_loss = loss_fn(preds, y_batch)
             total_val_loss += val_loss.item()
 
             # 3. Postprocess
-            final_preds = nms(preds)
-            ground_truth_objects = find_objects_in_target(y_batch, device)
+            preds_cpu = preds.detach().cpu()
+            targets_cpu = y_batch.detach().cpu()
+
+            final_preds = nms(preds_cpu)
+            ground_truth_objects = find_objects_in_target(targets_cpu, device)
 
             # 4. Find TP/FP and count total objects per class
             tp_fp_and_count_objects(final_preds, ground_truth_objects,
@@ -135,18 +138,18 @@ def compute_loss_accuracy(model, dl, device):
                                    precision_recall_lists)
     avg_val_loss = total_val_loss / len(dl)
 
-    return mAP, avg_val_loss, ap_by_class, precision_recall_lists,
+    return mAP, avg_val_loss, ap_by_class, precision_recall_lists
 
-def plot_history(num_epochs, history, hist_type: str):
+def plot_history(epochs, history, hist_type: str):
     fig, ax = plt.subplots(1, figsize=(5, 5 ))
-    epoch_range = list(range(1, num_epochs + 1))
 
-    axes[0].plot(epoch_range, history, c='k')
-    axes[0].set_title(f"{hist_type} History")
-    axes[0].set_xlabel("Epochs")
-    axes[0].set_ylabel(hist_type)
+    ax.plot(epochs, history, c='k')
+    ax.set_title(f"{hist_type} History")
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel(hist_type)
 
     plot_dir = Path(f"../outputs/plots/{hist_type}_history")
     plot_dir.mkdir(parents=True, exist_ok=True)
 
     fig.savefig(plot_dir / f"{hist_type} plot.png")
+    plt.close(fig)

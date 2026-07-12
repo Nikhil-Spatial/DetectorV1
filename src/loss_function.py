@@ -1,4 +1,4 @@
-from configs import LAMBDA_COORD, LAMBDA_NOOBJ, S, C
+from configs import LAMBDA_COORD, LAMBDA_NOOBJ, S, C, B
 import torch.nn as nn
 from utils import IoU
 import torch
@@ -21,7 +21,8 @@ class Loss(nn.Module):
 
     def forward(self, pred, target):
         total_loss = 0
-        batch_size = pred.shape[0].item()
+        batch_size = pred.shape[0]
+        pred = pred.reshape((batch_size, S, S, C + B * 5))
 
         # compute losses for each image in the batch, total the losses, and then average them
         for b in range(batch_size):

@@ -22,7 +22,8 @@ test_dataset = ImageDataset(annot_file_test, img_dir_test,
                             transform=test_transforms)
 
 generator1 = torch.Generator().manual_seed(SEED)
-train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2])
+train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2]
+                                          ,generator=generator1)
 
 train_dl = DataLoader(train_dataset, batch_size=32, shuffle=True)
 val_dl = DataLoader(val_dataset, batch_size=32)
@@ -30,13 +31,14 @@ test_dl = DataLoader(test_dataset, batch_size=32)
 
 # 2. Instantiate model, loss, etc.
 device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device: {device}")
 num_epochs = 75
 
-model = Model()
-loss_fn = Loss()
+model = Model().to(device)
+loss_fn = Loss().to(device)
 
 optimizer = torch.optim.SGD(model.parameters(), 1e-2, 0.9, weight_decay=0.0005)
-scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs+1, eta_min=1e-4)
+scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-4)
 
 # 3. Training Loop
 checkpoint_dir = Path("../outputs/checkpoints")
@@ -44,27 +46,29 @@ checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
 train_loss_history, val_loss_history = [], []
 train_mAP_history, val_mAP_history = [], []
+train_mAP_epochs = []
 
 for epoch in range(1, num_epochs + 1):
     # 1. Train Model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
-    train_loss_history.append(loss)
+    train_loss_history.append(train_loss)
     scheduler.step()
 
-    # 2. Evaluate on Training Data
-    train_mAP, _, _, _ = compute_accuracy(model, train_dl, device)
-    train_mAP_history.append(train_mAP)
-
-    # 3. Evaluate on Validation Data
-    val_mAP, val_loss, _, _ = compute_accuracy(model, val_dl, device)
+    # 2. Evaluate on Validation Data
+    val_mAP, val_loss, _, _ = compute_loss_accuracy(
+        model, loss_fn, val_dl, device)
     val_loss_history.append(val_loss)
     val_mAP_history.append(val_mAP)
 
-    # 4. Display Statistics
-    print(f"(Epoch {epoch}) Training: Loss - {train_loss} mAP - {train_mAP} | "
-          f"Validation: Loss - {val_loss} mAP - {val_mAP}")
-
+    train_mAP = "N/A"
     if epoch % 5 == 0:
+        # 3. Evaluate on Training Data Every 5 Epochs
+        train_mAP, _, _, _ = compute_loss_accuracy(
+            model, loss_fn, train_dl, device)
+        train_mAP_history.append(train_mAP)
+        train_mAP_epochs.append(epoch)
+
+        # 4. Save Checkpoints Every 5 Epochs
         checkpoint = {
             "epoch": epoch,
             "model_state_dict": model.state_dict(),
@@ -75,8 +79,14 @@ for epoch in range(1, num_epochs + 1):
 
         torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch}.pth")
 
+    # 5. Display Statistics
+    print(f"(Epoch {epoch}) Training: Loss - {train_loss} mAP - {train_mAP} | "
+          f"Validation: Loss - {val_loss} mAP - {val_mAP}")
+
 # plot all the lists of histories
-plot_history(epochs, train_loss_history, "training_loss")
-plot_history(epochs, val_loss_history, "val_loss")
-plot_history(epochs, train_mAP_history, "training_mAP")
-plot_history(epochs, val_mAP_history, "val_mAP")
+epoch_list = list(range(1, num_epochs + 1))
+
+plot_history(epoch_list, train_loss_history, "training_loss")
+plot_history(epoch_list, val_loss_history, "val_loss")
+plot_history(train_mAP_epochs, train_mAP_history, "training_mAP")
+plot_history(epoch_list, val_mAP_history, "val_mAP")
