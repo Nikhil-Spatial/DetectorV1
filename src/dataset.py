@@ -27,7 +27,7 @@ class ImageDataset(Dataset):
         return objects
 
     def _create_target_vector(self, objects):
-        target_vector = torch.zeros(7, 7, 30)
+        target_vector = torch.zeros(7, 7, 25)
         for object_ in objects:
             row = object_[2] // CELL_SIZE  # row number of the grid cell
             col = object_[1] // CELL_SIZE  # column number of the grid cell
@@ -38,15 +38,15 @@ class ImageDataset(Dataset):
                 cell[CLASS_TO_IDX[object_[0]]] = 1
 
                 # parameterize bbox x and y to be offsets of cell location
-                cell[C] = cell[C+5] = (object_[1] - (col * CELL_SIZE)) / CELL_SIZE
-                cell[C+1] = cell[C+6] = (object_[2] - (row * CELL_SIZE)) / CELL_SIZE
+                cell[C] = (object_[1] - (col * CELL_SIZE)) / CELL_SIZE
+                cell[C+1] = (object_[2] - (row * CELL_SIZE)) / CELL_SIZE
 
                 # normalize bbox width and height
-                cell[C+2] = cell[C+7] = object_[3] / IMAGE_SIZE
-                cell[C+3] = cell[C+8] = object_[4] / IMAGE_SIZE
+                cell[C+2] = object_[3] / IMAGE_SIZE
+                cell[C+3] = object_[4] / IMAGE_SIZE
 
                 # confidence = 1 for cells containing objects
-                cell[C+4] = cell[C+9] = 1
+                cell[C+4] = 1
 
         return target_vector
 
@@ -54,7 +54,8 @@ class ImageDataset(Dataset):
         img_filename = self.filenames[idx]
 
         img_path = self.img_dir / img_filename
-        image = decode_image(img_path).to(torch.float32) / 255.0 # normalize pixels
+        # Decode, Convert Datatype, and Normalize
+        image = decode_image(img_path).to(torch.float32) / 255.0
 
         objects = self._get_objects(img_filename)
         target_vector = self._create_target_vector(objects)
