@@ -46,7 +46,7 @@ class Loss(nn.Module):
                         # avoid errors with negative predictions
                         pred_w = torch.sign(pred_bbox[2]) * (pred_bbox[2].abs() + 1e-6).sqrt()
                         pred_h = torch.sign(pred_bbox[3]) * (pred_bbox[3].abs() + 1e-6).sqrt()
-
+                        
                         loss_2 += (target_bbox[2].sqrt() - pred_w).square() + \
                                   (target_bbox[3].sqrt() - pred_h).square()
 

@@ -1,4 +1,5 @@
-from configs import C, TP_IOU_THRESHOLD
+from configs import C, TP_IOU_THRESHOLD, IDX_TO_CLASS
+from operator import itemgetter
 from utils import IoU
 import torch
 

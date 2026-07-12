@@ -2,6 +2,7 @@ from evaluation import (compute_map, find_objects_in_target,
                         tp_fp_and_count_objects)
 from matplotlib import pyplot as plt
 from postprocessing import nms
+from configs import IDX_TO_CLASS
 from pathlib import Path
 import torch
 
@@ -129,7 +130,7 @@ def compute_loss_accuracy(model, loss_fn, dl, device):
             targets_cpu = y_batch.detach().cpu()
 
             final_preds = nms(preds_cpu)
-            ground_truth_objects = find_objects_in_target(targets_cpu, device)
+            ground_truth_objects = find_objects_in_target(targets_cpu)
 
             # 4. Find TP/FP and count total objects per class
             tp_fp_and_count_objects(final_preds, ground_truth_objects,
