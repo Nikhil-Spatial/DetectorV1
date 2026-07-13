@@ -78,7 +78,7 @@ def preprocess():
     trainval_img_dir = Path("../data/raw/VOCtrainval-2007/JPEGImages")
     test_img_dir = Path("../data/raw/VOCtest-2007/JPEGImages")
 
-    trainval_output_img_dir = Path("../data/preprocessed/trainval/Images")
+    trainval_output_img_dir = Path("../data/preprocessed/trainval/images")
     test_output_img_dir = Path("../data/preprocessed/test/Images")
 
     process_images(trainval_img_dir, trainval_output_img_dir)

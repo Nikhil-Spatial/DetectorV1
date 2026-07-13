@@ -1,4 +1,4 @@
-from src.configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, C
+from src.configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, C, S, B
 from torchvision.io import decode_image
 from torch.utils.data import Dataset
 import pandas as pd
@@ -27,7 +27,8 @@ class ImageDataset(Dataset):
         return objects
 
     def _create_target_vector(self, objects):
-        target_vector = torch.zeros(7, 7, 25)
+        target_vector = torch.zeros(S, S, C + (B * 5))
+        
         for object_ in objects:
             row = object_[2] // CELL_SIZE  # row number of the grid cell
             col = object_[1] // CELL_SIZE  # column number of the grid cell
