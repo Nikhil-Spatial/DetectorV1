@@ -15,7 +15,7 @@ def decode_preds_batch(preds_batch):
             for j in range(S):
                 cell = preds[i][j]
 
-                class_idx = cell[:C].argmax().item()
+                class_idx = cell[:C].argmax()
                 class_prob = cell[class_idx]
 
                 confidence_score = cell[C+4] * class_prob
@@ -26,6 +26,23 @@ def decode_preds_batch(preds_batch):
         decoded_preds_batch.append(decoded_preds)
 
     return torch.tensor(decoded_preds_batch)
+
+def filter_and_group_preds(decoded_preds):
+    """Filter predictions with confidence scores less than the threshold, and
+    group every remaining prediction by class name."""
+    valid_preds = {}
+
+    for pred in decoded_preds:
+        if pred[1] > CONFIDENCE_THRESHOLD:
+            class_name = IDX_TO_CLASS[pred[0].item()]
+
+            if class_name in valid_preds:
+                valid_preds[class_name].append(pred)
+
+            else:
+                valid_preds[class_name] = [pred]
+
+    return valid_preds
 
 def filter_group_sort_preds(decoded_preds):
     sorted_preds = []
