@@ -7,7 +7,7 @@ SEED = 7
 S = 7
 
 # number of bounding boxes each cell predicts
-B = 2
+B = 1
 
 # number of classes
 C = 20
