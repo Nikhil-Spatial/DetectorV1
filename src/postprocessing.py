@@ -30,42 +30,25 @@ def decode_preds_batch(preds_batch):
 def filter_and_group_preds(decoded_preds):
     """Filter predictions with confidence scores less than the threshold, and
     group every remaining prediction by class name."""
-    valid_preds = {}
+    filtered_grouped_preds = {}
 
     for pred in decoded_preds:
         if pred[1] > CONFIDENCE_THRESHOLD:
             class_name = IDX_TO_CLASS[pred[0].item()]
 
-            if class_name in valid_preds:
-                valid_preds[class_name].append(pred)
+            if class_name in filtered_grouped_preds:
+                filtered_grouped_preds[class_name].append(pred)
 
             else:
-                valid_preds[class_name] = [pred]
+                filtered_grouped_preds[class_name] = [pred]
 
-    return valid_preds
+    return filtered_grouped_preds
 
-def filter_group_sort_preds(decoded_preds):
-    sorted_preds = []
-
-    # 1. filter and group remaining predictions by class
-    for image in decoded_preds:
-        valid_preds = {}
-        for pred in image:
-            if pred[1] > CONFIDENCE_THRESHOLD:
-                class_name = pred[0]
-                if class_name in valid_preds:
-                    valid_preds[class_name].append(pred)
-                else:
-                    valid_preds[class_name] = [pred]
-
-        sorted_preds.append(valid_preds)
-
-    # 2. sort each class's predictions by confidence score
-    for image in sorted_preds:
-        for class_name in image:
-            image[class_name].sort(key=itemgetter(1))
-
-    return sorted_preds
+def sort_class_preds_by_confidence(filtered_grouped_preds):
+    """Sort the predictions in every class of the filtered and grouped
+    predictions dictionary by confidence score in ascending order."""
+    for class_name in filtered_grouped_preds:
+        filtered_grouped_preds[class_name].sort(key=itemgetter(1))
 
 def nms(preds_batch):
     # 1. decode batch of predictions
