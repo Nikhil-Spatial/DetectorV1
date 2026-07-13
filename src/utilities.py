@@ -1,4 +1,4 @@
-from src.configs import CELL_SIZE, IMAGE_SIZE
+from src.configs import IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, S, C
 from torch import round as rd
 import torch
 
@@ -43,3 +43,25 @@ def IoU(bbox_1, bbox_2):
 
     # 3. compute IoU
     return inter_area / union_area if union_area != 0 else 0
+
+def objects_in_target(target):
+    """Returns a dictionary that associates a list of the ground truth object
+    labels with each class that's present in a single image."""
+    objects_by_class = {}
+
+    for i in range(S):
+        for j in range(S):
+            cell = target[i][j]
+
+            if cell[C + 4] == 1:
+                class_idx = int(torch.argmax(cell[:C]))
+                class_name = IDX_TO_CLASS[class_idx]
+                bbox = cell[C:C+4]
+
+                if class_name in objects_by_class:
+                    objects_by_class[class_name].append(bbox)
+
+                else:
+                    objects_by_class[class_name] = [bbox]
+
+    return objects_by_class
