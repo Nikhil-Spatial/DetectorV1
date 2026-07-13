@@ -45,9 +45,9 @@ class Loss(torch.nn.Module):
 
         return loss
 
-    def forward(self, pred, target):
+    def forward(self, preds, targets):
         total_loss = 0
-        batch_size = pred.shape[0]
+        batch_size = preds.shape[0]
 
         # For each image in the batch, 1) compute losses, 2) total the losses,
         # and then 3) average them
@@ -57,7 +57,7 @@ class Loss(torch.nn.Module):
             for i in range(S):
                 for j in range(S):
                     pred_cell = pred[b][i][j]
-                    target_cell = target[b][i][j]
+                    target_cell = targets[b][i][j]
 
                     pred_confidence = pred_cell[C + 4]
                     target_confidence = target_cell[C + 4]
@@ -76,7 +76,7 @@ class Loss(torch.nn.Module):
                     # If the cell does not contain an object, compute loss 4
                     else:
                         loss_4 += self._compute_loss_4(pred_confidence,
-                                                     target_confidence)
+                                                       target_confidence)
 
             total_loss += (loss_1 + loss_2 + loss_3 + loss_4 + loss_5)
 
