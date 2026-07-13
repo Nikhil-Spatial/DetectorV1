@@ -1,35 +1,31 @@
 from src.configs import (S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD,
                          NMS_IOU_THRESHOLD)
-from src.utilities import convert_xywh_coords, IoU
+from src.utilities import convert_xywh_coordinates, IoU
 from operator import itemgetter
+import torch
 
-def decode_preds(preds_batch):
-    decoded_preds = []
+def decode_preds_batch(preds_batch):
+    decoded_preds_batch = []
 
-    for pred in preds_batch:
-        pred = pred.reshape((S, S, C + B * 5))
-        objects = []
+    for preds in preds_batch:
+        # Stores prediction class name, confidence score, and bbox of one instance
+        decoded_preds = []
 
         for i in range(S):
             for j in range(S):
-                pred_cell = pred[i][j]
+                cell = preds[i][j]
 
-                pred_class_idx = pred_cell[:C].argmax().item()
-                pred_class_prob = pred_cell[pred_class_idx].item()
-                pred_class = IDX_TO_CLASS[pred_class_idx]
+                class_idx = cell[:C].argmax().item()
+                class_prob = cell[class_idx]
 
-                pred_1_confidence = pred_cell[C+4].item() * pred_class_prob
-                pred_2_confidence = pred_cell[C+9].item() * pred_class_prob
+                confidence_score = cell[C+4] * class_prob
+                bbox = convert_xywh_coordinates(cell[C:C+4], i, j, False)
 
-                bbox_1 = convert_xywh_coords(pred_cell[C:C+4], i, j, False)
-                bbox_2 = convert_xywh_coords(pred_cell[C+5:C+9], i, j, False)
+                decoded_preds.append((class_idx, confidence_score) + bbox)
 
-                objects.append((pred_class, pred_1_confidence) + bbox_1)
-                objects.append((pred_class, pred_2_confidence) + bbox_2)
+        decoded_preds_batch.append(decoded_preds)
 
-        decoded_preds.append(objects)
-
-    return decoded_preds
+    return torch.tensor(decoded_preds_batch)
 
 def filter_group_sort_preds(decoded_preds):
     sorted_preds = []
