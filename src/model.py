@@ -1,7 +1,8 @@
+from src.configs import S, B, C
 import torch.nn.functional as F
 import torch.nn as nn
 import torch
-from src.configs import S, B, C
+
 
 class ResidualBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride):
@@ -29,11 +30,10 @@ class ResidualBlock(nn.Module):
 
         return F.relu(self.shortcut(original_x) + x)
 
-class Model(nn.Module):
+class ResidualBackbone(nn.Module):
     def __init__(self):
         super().__init__()
 
-        # Backbone
         # Layer1
         self.conv_1 = nn.Conv2d(3, 64, 7, padding=3)
 
@@ -50,17 +50,36 @@ class Model(nn.Module):
         self.res_blocks.append(ResidualBlock(256, 512, 2))
         self.res_blocks.append(ResidualBlock(512, 512, 2))
 
-        # Detector Head
+    def forward(self, x):
+        x = F.relu(self.conv_1(x))
+
+        for res_block in self.res_blocks:
+            x = res_block(x)
+
+        return torch.flatten(x, start_dim=1)
+
+
+class DetectorHead(nn.Module):
+    def __init__(self):
+        super().__init__()
+
         self.fc_1 = nn.Linear(25_088, 4096)
         self.dropout = nn.Dropout()
         self.fc_2 = nn.Linear(4096, (C + B * 5) * S * S)
 
     def forward(self, x):
-        x = F.relu(self.conv_1(x))
-        for res_block in self.res_blocks:
-            x = res_block(x)
-
-        x = torch.flatten(x, start_dim=1)
         x = self.dropout(F.relu(self.fc_1(x)))
-        x = self.fc_2(x)
-        return x.reshape((x.shape[0], 7, 7, 30))
+        return self.fc_2(x)
+
+class Model(nn.Module):
+    def __init__(self):
+        super().__init__()
+
+        self.backbone = ResidualBackbone()
+        self.detector_head = DetectorHead()
+
+    def forward(self, x):
+        x = self.backbone(x)
+        x = self.detector_head(x)
+
+        return x.reshape((x.shape[0], S, S, C + B * 5))

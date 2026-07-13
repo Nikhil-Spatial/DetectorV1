@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-from configs import IMAGE_SIZE
+from src.configs import IMAGE_SIZE
 from pathlib import Path
 from PIL import Image
 import csv
