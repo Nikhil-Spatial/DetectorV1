@@ -4,12 +4,16 @@ from src.utilities import IoU
 import torch
 
 def find_tp_and_fp(suppressed_preds, ground_truth_objects, tp_fp_by_class):
+    """Find and store the True Positive and False Positive predictions for a
+    single instance."""
     for class_name, preds in suppressed_preds.items():
         if class_name in ground_truth_objects:
             # Iterate through each prediction, find the ground truth object that
             # has the highest IoU with the prediction, and if that IoU surpasses
             # the threshold, it is a True Positive, else a False Positive.
             for pred in preds:
+                print(tp_fp_by_class)
+
                 IoUs = [IoU(ground_truth_object, pred[1:5]) for
                         ground_truth_object in ground_truth_objects[class_name]]
 
@@ -18,17 +22,25 @@ def find_tp_and_fp(suppressed_preds, ground_truth_objects, tp_fp_by_class):
                 if IoUs[max_idx] < TP_IOU_THRESHOLD:
                     tp_fp_by_class[class_name].append((pred[0], False))
 
-                elif objects[class_name][max_idx][-1] == 0:
-                    all_tp_fp_by_class[class_name].append((pred[1], True))
-                    objects[class_name][max_idx][-1] = 1
+                # If the tensor contains all negative values, it's already been
+                # associated with a prediction
+                elif torch.all(ground_truth_objects[class_name][max_idx] < 0):
+                    tp_fp_by_class[class_name].append((pred[0], False))
 
+                # Everything else is a True Positive. To mark the associated
+                # ground truth object as N/A, replace every value in the tensor
+                # with negative values
                 else:
-                    all_tp_fp_by_class[class_name].append((pred[1], False))
+                    tp_fp_by_class[class_name].append((pred[0], True))
+                    ground_truth_objects[class_name][max_idx] = (
+                        torch.arange(-5, -4, -3, -2))
+
         else:
-            # b. all predictions belonging to class are FP since there are
-            # no ground truth objects belonging to that class
+            # The rest of the predictions belonging to the class are False
+            # Positives since there are no ground truth objects belonging to
+            # that class
             for pred in preds:
-                all_tp_fp_by_class[class_name].append((pred[1], False))
+                tp_fp_by_class[class_name].append((pred[0], False))
 
 def compute_map(all_tp_fp_by_class, class_object_totals,
                 precision_recall_lists):

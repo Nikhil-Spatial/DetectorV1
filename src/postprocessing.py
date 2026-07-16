@@ -65,3 +65,18 @@ def non_maximum_suppression(filtered_grouped_preds):
     # Just a note, the predictions under each class are now sorted in decreasing
     # order instead of increasing order.
     return suppressed_preds
+
+def postprocess_preds(preds):
+    # 1. Decode predictions
+    decoded_preds = decode_preds(preds)
+
+    # 2. Filter and group predictions
+    filtered_grouped_preds = filter_and_group_preds(decoded_preds)
+
+    # 3. Sort the predictions belonging to each class by confidence scores
+    sort_class_preds_by_confidence(filtered_grouped_preds)
+
+    # 4. Perform non-maximum suppression to remove similar predictions
+    suppressed_preds = non_maximum_suppression(filtered_grouped_preds)
+
+    return suppressed_preds
