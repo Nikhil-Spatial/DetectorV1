@@ -58,11 +58,6 @@ def non_maximum_suppression(filtered_grouped_preds):
             highest_conf = preds.pop()
             suppressed_preds[class_name].append(highest_conf)
 
-            print(highest_conf)
-            for pred in preds:
-                print(pred)
-                print(IoU(highest_conf[1:5], pred[1:5]))
-
             # 2. Filter out or "suppress" the bboxes that are too similar
             preds = [pred for pred in preds if
                      IoU(highest_conf[1:5], pred[1:5]) < NMS_IOU_THRESHOLD]
