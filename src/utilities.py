@@ -44,14 +44,14 @@ def IoU(bbox_1, bbox_2):
     # 3. compute IoU
     return inter_area / union_area if union_area != 0 else 0
 
-def objects_in_target(target):
+def get_ground_truth_objects_by_class(ground_truth_objects):
     """Returns a dictionary that associates a list of the ground truth object
     labels with each class that's present in a single image."""
-    objects_by_class = {}
+    ground_truth_objects_by_class = {}
 
     for i in range(S):
         for j in range(S):
-            cell = target[i][j]
+            cell = ground_truth_objects[i][j]
 
             if cell[C + 4] == 1:
                 class_idx = int(torch.argmax(cell[:C]))
@@ -60,10 +60,10 @@ def objects_in_target(target):
                 bbox = cell[C:C+4]
                 bbox = convert_xywh_coordinates(bbox, i, j, False)
 
-                if class_name in objects_by_class:
-                    objects_by_class[class_name].append(bbox)
+                if class_name in ground_truth_objects_by_class:
+                    ground_truth_objects_by_class[class_name].append(bbox)
 
                 else:
-                    objects_by_class[class_name] = [bbox]
+                    ground_truth_objects_by_class[class_name] = [bbox]
 
-    return objects_by_class
+    return ground_truth_objects_by_class

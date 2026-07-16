@@ -3,20 +3,22 @@ from operator import itemgetter
 from src.utilities import IoU
 import torch
 
-def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
+def find_tp_and_fp(postprocessed_preds, ground_truth_objects_by_class,
+                   tp_fp_by_class):
     """Find and store the True Positive and False Positive predictions for a
     single instance."""
     for class_name, preds in postprocessed_preds.items():
-        if class_name in ground_truth_objects:
+        if class_name in ground_truth_objects_by_class:
             # Iterate through each prediction, find the ground truth object that
             # has the highest IoU with the prediction, and if that IoU surpasses
             # the threshold, it is a True Positive, else a False Positive.
             for pred in preds:
                 print(tp_fp_by_class, "\n")
-                print(ground_truth_objects, "\n")
+                print(ground_truth_objects_by_class, "\n")
 
                 IoUs = [IoU(ground_truth_object, pred[1:5]) for
-                        ground_truth_object in ground_truth_objects[class_name]]
+                        ground_truth_object in
+                        ground_truth_objects_by_class[class_name]]
 
                 max_idx = IoUs.index(max(IoUs))
 
@@ -25,7 +27,8 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
 
                 # If the tensor contains all negative values, it's already been
                 # associated with a prediction
-                elif all(x < 0 for x in ground_truth_objects[class_name][max_idx]):
+                elif all(x < 0 for x in
+                         ground_truth_objects_by_class[class_name][max_idx]):
                     tp_fp_by_class[class_name].append((pred[0], False))
 
                 # Everything else is a True Positive. To mark the associated
@@ -33,7 +36,7 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
                 # with negative values
                 else:
                     tp_fp_by_class[class_name].append((pred[0], True))
-                    ground_truth_objects[class_name][max_idx] = (
+                    ground_truth_objects_by_class[class_name][max_idx] = (
                         torch.arange(-5, -1))
 
         else:
@@ -42,6 +45,13 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
             # that class
             for pred in preds:
                 tp_fp_by_class[class_name].append((pred[0], False))
+
+def count_objects_in_each_class(ground_truth_objects_by_class,
+                                class_object_totals):
+    """Add the number of objects that belong to each class for one image to the
+    total in the dictionary."""
+    for class_name, ground_truth_objects in ground_truth_objects_by_class.items():
+        class_object_totals[class_name] += len(ground_truth_objects)
 
 def compute_map(all_tp_fp_by_class, class_object_totals,
                 precision_recall_lists):
