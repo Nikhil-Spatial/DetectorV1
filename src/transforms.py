@@ -6,16 +6,12 @@ import torch
 MEANS = (0.4485, 0.4249, 0.3922)
 STDS = (0.2682, 0.2655, 0.2782)
 
-color_transform = torch.nn.ModuleList([
+trainval_transforms = v2.Compose([
     v2.ColorJitter(
         brightness=[0.6, 1.4],
         contrast=[0.6, 1.4],
         saturation=[0.6, 1.4]
-    )
-])
-
-trainval_transforms = v2.Compose([
-    v2.RandomApply(color_transform, p=1),
+    ),
     v2.Normalize(mean=MEANS, std=STDS)
 ])
 
