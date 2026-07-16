@@ -12,7 +12,8 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
             # has the highest IoU with the prediction, and if that IoU surpasses
             # the threshold, it is a True Positive, else a False Positive.
             for pred in preds:
-                print(tp_fp_by_class)
+                print(tp_fp_by_class, "\n")
+                print(ground_truth_objects, "\n")
 
                 IoUs = [IoU(ground_truth_object, pred[1:5]) for
                         ground_truth_object in ground_truth_objects[class_name]]
@@ -24,7 +25,7 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
 
                 # If the tensor contains all negative values, it's already been
                 # associated with a prediction
-                elif torch.all(ground_truth_objects[class_name][max_idx] < 0):
+                elif all(x < 0 for x in ground_truth_objects[class_name][max_idx]):
                     tp_fp_by_class[class_name].append((pred[0], False))
 
                 # Everything else is a True Positive. To mark the associated
@@ -33,7 +34,7 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
                 else:
                     tp_fp_by_class[class_name].append((pred[0], True))
                     ground_truth_objects[class_name][max_idx] = (
-                        torch.arange(-5, -4, -3, -2))
+                        torch.arange(-5, -1))
 
         else:
             # The rest of the predictions belonging to the class are False

@@ -19,7 +19,7 @@ CONFIDENCE_THRESHOLD = 0
 NMS_IOU_THRESHOLD = 0.2
 
 # used to find which predictions are true positives
-TP_IOU_THRESHOLD = 0
+TP_IOU_THRESHOLD = float("-inf")
 
 # height and width of a single grid cell in pixels
 CELL_SIZE = int(IMAGE_SIZE / S)
