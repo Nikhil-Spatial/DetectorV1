@@ -13,10 +13,10 @@ B = 1
 C = 20
 
 # used to filter the raw predictions
-CONFIDENCE_THRESHOLD = 0.375
+CONFIDENCE_THRESHOLD = 0
 
 # used to filter bounding boxes that attempt to box the same object
-NMS_IOU_THRESHOLD = 0.625
+NMS_IOU_THRESHOLD = 0.2
 
 # used to find which predictions are true positives
 TP_IOU_THRESHOLD = 0
