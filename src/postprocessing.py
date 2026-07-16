@@ -48,16 +48,18 @@ def sort_class_preds_by_confidence(filtered_grouped_preds):
 def non_maximum_suppression(filtered_grouped_preds):
     """Perform non-maximum suppression to remove predictions that attempt to
     bound the same ground truth object."""
-    processed_preds = {}
+    suppressed_preds = {}
 
     for class_name, preds in filtered_grouped_preds.items():
-        processed_preds[class_name] = []
+        suppressed_preds[class_name] = []
 
-        while preds:
+        while preds: # while preds is not empty
+            # 1. Pop and store prediction with the highest confidence
             highest_conf = preds.pop()
-            final_img_preds[class_name].append(highest_conf)
+            suppressed_preds[class_name].append(highest_conf)
 
+            # 2. Filter out or "suppress" the bboxes that are too similar
             preds = [pred for pred in preds if
-                     IoU(highest_conf[2:6], pred[2:6]) < NMS_IOU_THRESHOLD]
+                     IoU(highest_conf[1:5], pred[1:5]) < NMS_IOU_THRESHOLD]
 
-    return final_preds
+    return suppressed_preds
