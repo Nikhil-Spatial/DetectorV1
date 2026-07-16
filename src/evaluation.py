@@ -3,10 +3,10 @@ from operator import itemgetter
 from src.utilities import IoU
 import torch
 
-def find_tp_and_fp(suppressed_preds, ground_truth_objects, tp_fp_by_class):
+def find_tp_and_fp(postprocessed_preds, ground_truth_objects, tp_fp_by_class):
     """Find and store the True Positive and False Positive predictions for a
     single instance."""
-    for class_name, preds in suppressed_preds.items():
+    for class_name, preds in postprocessed_preds.items():
         if class_name in ground_truth_objects:
             # Iterate through each prediction, find the ground truth object that
             # has the highest IoU with the prediction, and if that IoU surpasses

@@ -56,7 +56,9 @@ def objects_in_target(target):
             if cell[C + 4] == 1:
                 class_idx = int(torch.argmax(cell[:C]))
                 class_name = IDX_TO_CLASS[class_idx]
+
                 bbox = cell[C:C+4]
+                bbox = convert_xywh_coordinates(bbox, i, j, False)
 
                 if class_name in objects_by_class:
                     objects_by_class[class_name].append(bbox)
