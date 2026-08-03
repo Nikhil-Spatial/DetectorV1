@@ -13,9 +13,6 @@ def find_tp_and_fp(postprocessed_preds, ground_truth_objects_by_class,
             # has the highest IoU with the prediction, and if that IoU surpasses
             # the threshold, it is a True Positive, else a False Positive.
             for pred in preds:
-                print(tp_fp_by_class, "\n")
-                print(ground_truth_objects_by_class, "\n")
-
                 IoUs = [IoU(ground_truth_object, pred[1:5]) for
                         ground_truth_object in
                         ground_truth_objects_by_class[class_name]]
@@ -53,11 +50,11 @@ def count_objects_in_each_class(ground_truth_objects_by_class,
     for class_name, ground_truth_objects in ground_truth_objects_by_class.items():
         class_object_totals[class_name] += len(ground_truth_objects)
 
-def compute_map(all_tp_fp_by_class, class_object_totals,
-                precision_recall_lists):
+def average_precision(tp_fp_by_class, class_object_totals,
+                      precision_recall_lists):
     ap_by_class = {}
 
-    for class_name, tp_fp_list in all_tp_fp_by_class.items():
+    for class_name, tp_fp_list in tp_fp_by_class.items():
         if class_object_totals[class_name] == 0:
             continue
 
@@ -69,7 +66,7 @@ def compute_map(all_tp_fp_by_class, class_object_totals,
         # 2. iterate through list of TP/FPs and compute precision/recall
         true_positives = 0
 
-        precision_denom = 0  # denominator - <total TP or FP>
+        precision_denom = 0  # denominator: <total TP and FP>
         recall_denom = class_object_totals[
             class_name]  # denominator - <total objects in class>
 
