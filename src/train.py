@@ -1,9 +1,9 @@
 from src.transforms import trainval_transforms, test_transforms
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
+from src.configs import SEED, BATCH_SIZE
 from src.dataset import ImageDataset
 from src.loss_function import Loss
-from src.configs import SEED
 from src.model import Model
 from pathlib import Path
 import torch
@@ -24,9 +24,9 @@ generator_ = torch.Generator().manual_seed(SEED)
 train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2]
                                           ,generator=generator_)
 
-train_dl = DataLoader(train_dataset, batch_size=32, shuffle=True)
-val_dl = DataLoader(val_dataset, batch_size=32)
-test_dl = DataLoader(test_dataset, batch_size=32)
+train_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
+val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE)
+test_dl = DataLoader(test_dataset, batch_size=BATCH_SIZE)
 
 # 2. Instantiate model, loss function, device, optimizer, and scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"

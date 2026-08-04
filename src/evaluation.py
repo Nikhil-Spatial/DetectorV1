@@ -1,6 +1,6 @@
+from src.utilities import IoU
 from src.configs import C, TP_IOU_THRESHOLD, IDX_TO_CLASS
 from operator import itemgetter
-from src.utilities import IoU
 import torch
 
 def find_tp_and_fp(postprocessed_preds, ground_truth_objects_by_class,
@@ -103,4 +103,19 @@ def mean_average_precision(ap_by_class):
     return mAP
 
 def evaluate(postprocessed_preds, ground_truth_objects_by_class,
-             precision_recall_lists):
+             precision_recall_lists, tp_fp_by_class, class_object_totals):
+    # 1. find and store the true and false positives
+    find_tp_and_fp(postprocessed_preds, ground_truth_objects_by_class,
+                   tp_fp_by_class)
+
+    # 2. count number of objects in each class
+    count_objects_in_each_class(ground_truth_objects_by_class,
+                                class_object_totals)
+
+    # 3. compute average precision (AP) for each class
+    ap_by_class = average_precision(tp_fp_by_class, class_object_totals)
+
+    # 4. compute mean average precision (mAP)
+    mAP = mean_average_precision(ap_by_class)
+
+    return mAP, ap_by_class

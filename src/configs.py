@@ -57,3 +57,6 @@ IDX_TO_CLASS = {
 # objects. So, these are for the loss functions.
 LAMBDA_COORD = 5
 LAMBDA_NOOBJ = 0.5
+
+# size of batches in DataLoader
+BATCH_SIZE = 32
