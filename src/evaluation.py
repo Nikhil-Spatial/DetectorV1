@@ -101,3 +101,6 @@ def mean_average_precision(ap_by_class):
     mAP = sum(ap_by_class.values()) / len(ap_by_class)
 
     return mAP
+
+def evaluate(postprocessed_preds, ground_truth_objects_by_class,
+             precision_recall_lists):

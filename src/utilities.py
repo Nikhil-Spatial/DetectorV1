@@ -67,3 +67,81 @@ def get_ground_truth_objects_by_class(ground_truth_objects):
                     ground_truth_objects_by_class[class_name] = [bbox]
 
     return ground_truth_objects_by_class
+
+def get_empty_tp_fp_by_class():
+    tp_fp_by_class = {
+        "aeroplane": [],
+        "bicycle": [],
+        "bird": [],
+        "boat": [],
+        "bottle": [],
+        "bus": [],
+        "car": [],
+        "cat": [],
+        "chair": [],
+        "cow": [],
+        "diningtable": [],
+        "dog": [],
+        "horse": [],
+        "motorbike": [],
+        "person": [],
+        "pottedplant": [],
+        "sheep": [],
+        "sofa": [],
+        "train": [],
+        "tvmonitor": [],
+    }
+
+    return tp_fp_by_class
+
+def get_empty_class_object_totals():
+    class_object_totals = {
+        "aeroplane": 0,
+        "bicycle": 0,
+        "bird": 0,
+        "boat": 0,
+        "bottle": 0,
+        "bus": 0,
+        "car": 0,
+        "cat": 0,
+        "chair": 0,
+        "cow": 0,
+        "diningtable": 0,
+        "dog": 0,
+        "horse": 0,
+        "motorbike": 0,
+        "person": 0,
+        "pottedplant": 0,
+        "sheep": 0,
+        "sofa": 0,
+        "train": 0,
+        "tvmonitor": 0,
+    }
+
+    return class_object_totals
+
+def get_empty_precision_recall_lists():
+    precision_recall_lists = {
+        "aeroplane": ([], []),
+        "bicycle": ([], []),
+        "bird": ([], []),
+        "boat": ([], []),
+        "bottle": ([], []),
+        "bus": ([], []),
+        "car": ([], []),
+        "cat": ([], []),
+        "chair": ([], []),
+        "cow": ([], []),
+        "diningtable": ([], []),
+        "dog": ([], []),
+        "horse": ([], []),
+        "motorbike": ([], []),
+        "person": ([], []),
+        "pottedplant": ([], []),
+        "sheep": ([], []),
+        "sofa": ([], []),
+        "train": ([], []),
+        "tvmonitor": ([], []),
+    }
+
+    return precision_recall_lists

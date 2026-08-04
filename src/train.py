@@ -45,5 +45,18 @@ checkpoint_dir.mkdir(parents=True, exist_ok=True)
 train_loss_history, val_loss_history = [], []
 train_mAP_history, val_mAP_history = [], []
 
+for epoch in range(num_epochs):
+    # 1. Train Model
+
+
+    # 2. Evaluate Model Performance on Training Dataset
+
+    # 3. Evaluate Model Performance on Validation Dataset
+
+    # 4. Save Checkpoints
+
+    # 5. Display Statistics
+
+    pass
 
 
