@@ -56,25 +56,28 @@ def average_precision(tp_fp_by_class, class_object_totals,
 
     for class_name, tp_fp_list in tp_fp_by_class.items():
         if class_object_totals[class_name] == 0:
+            ap_by_class[class_name] = 0
             continue
 
-        AP = 0
+        # declare/reset average precision to zero
+        ap = 0
 
-        # 1. sort every list of TP/FPs in each class
+        # 1. sort every list of TP/FPs in each class by descending order
         tp_fp_list.sort(key=itemgetter(0), reverse=True)
 
         # 2. iterate through list of TP/FPs and compute precision/recall
         true_positives = 0
 
-        precision_denom = 0  # denominator: <total TP and FP>
-        recall_denom = class_object_totals[
-            class_name]  # denominator - <total objects in class>
+        precision_denom = 0  # denominator: <Total TP + FP>
+        recall_denom = class_object_totals[class_name]  # denominator - <total objects in class>
 
         previous_recall = 0
 
         precision_list = precision_recall_lists[class_name][0]
         recall_list = precision_recall_lists[class_name][1]
 
+        # iteratively, compute the area under the precision-recall curve via
+        # riemann sums
         for _, status in tp_fp_list:
             true_positives += status
             precision_denom += 1
@@ -86,12 +89,15 @@ def average_precision(tp_fp_by_class, class_object_totals,
             recall_list.append(recall)
 
             delta_recall = recall - previous_recall
-            AP += precision * delta_recall
+            ap += (precision * delta_recall)
 
             previous_recall = recall
 
-        ap_by_class[class_name] = AP
+        ap_by_class[class_name] = ap
 
+    return ap_by_class
+
+def mean_average_precision(ap_by_class):
     mAP = sum(ap_by_class.values()) / len(ap_by_class)
 
-    return mAP, ap_by_class
+    return mAP 
