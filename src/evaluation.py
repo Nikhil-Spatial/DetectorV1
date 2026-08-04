@@ -102,20 +102,12 @@ def mean_average_precision(ap_by_class):
 
     return mAP
 
-def evaluate(postprocessed_preds, ground_truth_objects_by_class,
-             precision_recall_lists, tp_fp_by_class, class_object_totals):
-    # 1. find and store the true and false positives
-    find_tp_and_fp(postprocessed_preds, ground_truth_objects_by_class,
-                   tp_fp_by_class)
+def evaluate(tp_fp_by_class, class_object_totals, precision_recall_lists):
+    # 1. compute average precision (AP) for each class
+    ap_by_class = average_precision(tp_fp_by_class, class_object_totals,
+                                    precision_recall_lists)
 
-    # 2. count number of objects in each class
-    count_objects_in_each_class(ground_truth_objects_by_class,
-                                class_object_totals)
-
-    # 3. compute average precision (AP) for each class
-    ap_by_class = average_precision(tp_fp_by_class, class_object_totals)
-
-    # 4. compute mean average precision (mAP)
+    # 2. compute mean average precision (mAP)
     mAP = mean_average_precision(ap_by_class)
 
     return mAP, ap_by_class
