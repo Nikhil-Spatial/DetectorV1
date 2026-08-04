@@ -60,7 +60,7 @@ def average_precision(tp_fp_by_class, class_object_totals,
             continue
 
         # declare/reset average precision to zero
-        ap = 0
+        AP = 0
 
         # 1. sort every list of TP/FPs in each class by descending order
         tp_fp_list.sort(key=itemgetter(0), reverse=True)
@@ -89,15 +89,15 @@ def average_precision(tp_fp_by_class, class_object_totals,
             recall_list.append(recall)
 
             delta_recall = recall - previous_recall
-            ap += (precision * delta_recall)
+            AP += (precision * delta_recall)
 
             previous_recall = recall
 
-        ap_by_class[class_name] = ap
+        ap_by_class[class_name] = AP
 
     return ap_by_class
 
 def mean_average_precision(ap_by_class):
     mAP = sum(ap_by_class.values()) / len(ap_by_class)
 
-    return mAP 
+    return mAP
