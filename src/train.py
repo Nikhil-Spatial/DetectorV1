@@ -2,6 +2,7 @@ from src.transforms import trainval_transforms, test_transforms
 from src.inference_functions import compute_eval_stats
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
+from src.visualization import plot_history
 from src.configs import SEED, BATCH_SIZE
 from src.train_functions import train
 from src.dataset import ImageDataset
@@ -13,14 +14,9 @@ import torch
 annot_file_trainval = Path("../data/preprocessed/trainval/annotations.csv")
 img_dir_trainval = Path("../data/preprocessed/trainval/Images")
 
-annot_file_test = Path("../data/preprocessed/test/annotations.csv")
-img_dir_test = Path("../data/preprocessed/test/Images")
-
 # 1. Datasets and DataLoaders
 trainval_dataset = ImageDataset(annot_file_trainval, img_dir_trainval,
                                 transform=trainval_transforms)
-test_dataset = ImageDataset(annot_file_test, img_dir_test,
-                            transform=test_transforms)
 
 generator_ = torch.Generator().manual_seed(SEED)
 train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2]
@@ -28,11 +24,10 @@ train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2]
 
 train_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE)
-test_dl = DataLoader(test_dataset, batch_size=BATCH_SIZE)
 
 # 2. Instantiate model, loss function, device, optimizer, and scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
-num_epochs = 75
+num_epochs = 15
 
 model = Model().to(device)
 loss_fn = Loss().to(device)
@@ -74,8 +69,8 @@ for epoch in range(num_epochs):
     torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch+1}.pth")
 
     # e. Display Statistics
-    print(f"(Epoch {epoch+1}) Training: Loss - {train_loss} mAP - {train_mAP} | "
-          f"Validation: Loss - {val_loss} mAP - {val_mAP}")
+    print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} mAP - "
+          f"{train_mAP:.4f} | Validation: Loss - {val_loss} mAP - {val_mAP}")
 
 # 4. Plot and save all the history lists
 epoch_list = list(range(1, num_epochs+1))

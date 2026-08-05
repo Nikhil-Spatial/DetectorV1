@@ -1,4 +1,7 @@
+from matplotlib import pyplot as plt
 import bbox_visualizer as bbv
+from pathlib import Path
+import math
 
 def draw_rectangles(image, coords, labels):
     image = image.permute(1, 2, 0).numpy()
@@ -12,6 +15,10 @@ def draw_rectangles(image, coords, labels):
 
 def plot_history(epoch_list, history, hist_type: str):
     fig, ax = plt.subplots(1, figsize=(5, 5))
+
+    # force x-ticks to be integers only
+    integer_ticks = range(math.floor(min(epoch_list)), math.ceil(max(epoch_list)) + 1)
+    plt.xticks(integer_ticks)
 
     ax.plot(epoch_list, history, c='k')
     ax.set_title(f"{hist_type} History")

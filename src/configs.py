@@ -13,13 +13,13 @@ B = 1
 C = 20
 
 # used to filter the raw predictions
-CONFIDENCE_THRESHOLD = 0
+CONFIDENCE_THRESHOLD = 0.5
 
 # used to filter bounding boxes that attempt to box the same object
-NMS_IOU_THRESHOLD = 0.2
+NMS_IOU_THRESHOLD = 0.5
 
 # used to find which predictions are true positives
-TP_IOU_THRESHOLD = float("-inf")
+TP_IOU_THRESHOLD = 0.5
 
 # height and width of a single grid cell in pixels
 CELL_SIZE = int(IMAGE_SIZE / S)
