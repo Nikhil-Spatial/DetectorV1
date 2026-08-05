@@ -42,10 +42,10 @@ def compute_eval_stats(model, dl, device, loss_fn=None):
 
     tp_fp_by_class = get_empty_tp_fp_by_class()
     class_object_totals = get_empty_class_object_totals()
-    precision_recall_Lists = get_empty_precision_recall_lists()
+    precision_recall_lists = get_empty_precision_recall_lists()
 
     model.eval()
-    with torch.no_grad():
+    with (torch.no_grad()):
         for X_batch, y_batch in dl:
             X_batch = X_batch.to(device)
             y_batch = y_batch.to(device)
@@ -61,10 +61,10 @@ def compute_eval_stats(model, dl, device, loss_fn=None):
             # 3. a) postprocess predictions, b) sort and bucket ground truth
             # objects by class, c) find True and False Positives, and d) count
             # the number of objects in each class
-            for i in range(BATCH_SIZE):
-                postprocessed_preds = postprocess_preds(preds_batch[i])
-                ground_truth_objects_by_class = get_ground_truth_objects_by_class(
-                    y_batch[i]
+            for preds, target in zip(preds_batch, y_batch):
+                postprocessed_preds = postprocess_preds(preds)
+                ground_truth_objects_by_class = (
+                    get_ground_truth_objects_by_class(target)
                 )
 
                 find_tp_and_fp(postprocessed_preds,
@@ -72,7 +72,7 @@ def compute_eval_stats(model, dl, device, loss_fn=None):
                 count_objects_in_each_class(ground_truth_objects_by_class,
                                             class_object_totals)
 
-        # 4. Compute average precision (AP) for each class and mean average 
+        # 4. Compute average precision (AP) for each class and mean average
         # precision (mAP) across all classes
         mAP, ap_by_class = evaluate(tp_fp_by_class, class_object_totals,
                                     precision_recall_lists)
@@ -81,4 +81,4 @@ def compute_eval_stats(model, dl, device, loss_fn=None):
         avg_val_loss = total_val_loss / len(dl)
         return mAP, ap_by_class, avg_val_loss, precision_recall_lists
 
-    return mAP, ap_by_class, avg_val_loss, precision_recall_lists
+    return mAP, ap_by_class, precision_recall_lists
