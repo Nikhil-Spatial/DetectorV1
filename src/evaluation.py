@@ -104,7 +104,8 @@ def mean_average_precision(ap_by_class):
 
     return mAP
 
-def evaluate(tp_fp_by_class, class_object_totals, precision_recall_lists=None):
+def evaluate(tp_fp_by_class, class_object_totals, precision_recall_lists=None,
+             ap_by_class_return=False):
     # 1. compute average precision (AP) for each class
     ap_by_class = average_precision(tp_fp_by_class, class_object_totals,
                                     precision_recall_lists)
@@ -112,4 +113,7 @@ def evaluate(tp_fp_by_class, class_object_totals, precision_recall_lists=None):
     # 2. compute mean average precision (mAP)
     mAP = mean_average_precision(ap_by_class)
 
-    return mAP, ap_by_class
+    if ap_by_class_return:
+        return mAP, ap_by_class
+
+    return mAP

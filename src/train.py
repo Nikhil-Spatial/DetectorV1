@@ -1,6 +1,6 @@
 from src.transforms import trainval_transforms, test_transforms
+from src.train_functions import train, compute_eval_stats
 from torch.optim.lr_scheduler import CosineAnnealingLR
-from src.train_loop_functions import train, compute_eval_stats
 from torch.utils.data import random_split, DataLoader
 from src.configs import SEED, BATCH_SIZE
 from src.dataset import ImageDataset
@@ -52,7 +52,6 @@ for epoch in range(num_epochs):
     scheduler.step()
 
     # 2. Evaluate Model Performance on Training Dataset
-    mAP, _, _
 
     # 3. Evaluate Model Performance on Validation Dataset
 
