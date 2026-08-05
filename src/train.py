@@ -1,14 +1,14 @@
-from src.transforms import trainval_transforms, test_transforms
-from src.inference_functions import compute_eval_stats
+from transforms import trainval_transforms, test_transforms
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
-from src.visualization import plot_history
-from src.configs import SEED, BATCH_SIZE
-from src.train_functions import train
-from src.dataset import ImageDataset
-from src.loss_function import Loss
-from src.model import Model
+from inference_functions import compute_eval_stats
+from visualization import plot_history
+from configs import SEED, BATCH_SIZE
+from train_functions import train
+from dataset import ImageDataset
+from loss_function import Loss
 from pathlib import Path
+from model import Model
 import torch
 
 annot_file_trainval = Path("../data/preprocessed/trainval/annotations.csv")

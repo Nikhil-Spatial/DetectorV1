@@ -1,4 +1,4 @@
-from src.configs import S, B, C
+from configs import S, B, C
 import torch.nn.functional as F
 import torch.nn as nn
 import torch

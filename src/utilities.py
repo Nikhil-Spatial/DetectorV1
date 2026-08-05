@@ -1,4 +1,4 @@
-from src.configs import IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, S, C
+from configs import IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, S, C
 from torch import round as rd
 import torch
 
