@@ -9,3 +9,17 @@ def draw_rectangles(image, coords, labels):
                                     (255, 255, 255))
 
     return image
+
+def plot_history(epoch_list, history, hist_type: str):
+    fig, ax = plt.subplots(1, figsize=(5, 5))
+
+    ax.plot(epoch_list, history, c='k')
+    ax.set_title(f"{hist_type} History")
+    ax.set_xlabel("Epochs")
+    ax.set_ylabel(hist_type)
+
+    plot_dir = Path(f"../outputs/plots")
+    plot_dir.mkdir(parents=True, exist_ok=True)
+
+    fig.savefig(plot_dir / f"{hist_type}_history_plot.png")
+    plt.close(fig)
