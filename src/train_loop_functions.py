@@ -1,7 +1,6 @@
 from src.evaluation import (find_tp_and_fp, count_objects_in_each_class,
                             evaluate)
 from src.utilities import (get_ground_truth_objects_by_class,
-                           get_empty_precision_recall_lists,
                            get_empty_class_object_totals,
                            get_empty_tp_fp_by_class)
 from src.postprocessing import postprocess_preds
@@ -42,7 +41,6 @@ def compute_eval_stats(model, dl, device, loss_fn=None):
 
     tp_fp_by_class = get_empty_tp_fp_by_class()
     class_object_totals = get_empty_class_object_totals()
-    precision_recall_lists = get_empty_precision_recall_lists()
 
     model.eval()
     with (torch.no_grad()):
@@ -74,11 +72,10 @@ def compute_eval_stats(model, dl, device, loss_fn=None):
 
         # 4. Compute average precision (AP) for each class and mean average
         # precision (mAP) across all classes
-        mAP, ap_by_class = evaluate(tp_fp_by_class, class_object_totals,
-                                    precision_recall_lists)
+        mAP, ap_by_class = evaluate(tp_fp_by_class, class_object_totals)
 
     if loss_fn:
         avg_val_loss = total_val_loss / len(dl)
-        return mAP, ap_by_class, avg_val_loss, precision_recall_lists
+        return mAP, ap_by_class, avg_val_loss
 
-    return mAP, ap_by_class, precision_recall_lists
+    return mAP, ap_by_class
