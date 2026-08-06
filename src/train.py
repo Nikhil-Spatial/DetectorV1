@@ -40,8 +40,8 @@ val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4,
 # 2. instantiate model, loss function, device, optimizer, and scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-model = Model().to(device)
-loss_fn = Loss().to(device)
+model = Model().to(device, non_blocking=True)
+loss_fn = Loss().to(device, non_blocking=True)
 
 optimizer = torch.optim.Adam(model.parameters(), 1e-4)
 
