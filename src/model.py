@@ -1,4 +1,4 @@
-from configs import S, B, C
+from src.configs import S, B, C
 import torch.nn.functional as F
 import torch.nn as nn
 import torch
@@ -64,7 +64,7 @@ class DetectorHead(nn.Module):
         super().__init__()
 
         self.fc_1 = nn.Linear(25_088, 4096)
-        self.dropout = nn.Dropout()
+        self.dropout = nn.Identity()
         self.fc_2 = nn.Linear(4096, (C + B * 5) * S * S)
 
     def forward(self, x):
@@ -81,5 +81,10 @@ class Model(nn.Module):
     def forward(self, x):
         x = self.backbone(x)
         x = self.detector_head(x)
+
+        # Use sigmoid activation function on the x, y, w, h, and confidence
+        for i in range(x.shape[0]):
+            for j in range(20, 1221, 25):
+                x[i][j:j+5] = F.sigmoid(x[i][j:j+5])
 
         return x.reshape((x.shape[0], S, S, C + B * 5))
