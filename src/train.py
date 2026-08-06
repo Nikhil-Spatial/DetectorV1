@@ -32,8 +32,7 @@ num_epochs = 15
 model = Model().to(device)
 loss_fn = Loss().to(device)
 
-optimizer = torch.optim.SGD(model.parameters(), 1e-2, 0.9, weight_decay=0.0005)
-scheduler = CosineAnnealingLR(optimizer, T_max=num_epochs, eta_min=1e-4)
+optimizer = torch.optim.Adam(model.parameters(), 1e-4)
 
 # 3. Training loop
 checkpoint_dir = Path("../outputs/checkpoints")
@@ -45,7 +44,6 @@ train_mAP_history, val_mAP_history = [], []
 for epoch in range(num_epochs):
     # a. Train Model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
-    scheduler.step()
 
     # b. Evaluate Model Performance on Training Dataset
     train_mAP = compute_eval_stats(model, train_dl, device)
@@ -62,8 +60,7 @@ for epoch in range(num_epochs):
         "epoch": epoch+1,
         "model_state_dict": model.state_dict(),
         "optimizer_state_dict": optimizer.state_dict(),
-        "val_loss": val_loss,
-        "scheduler_state_dict": scheduler.state_dict()
+        "val_loss": val_loss
     }
 
     torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch+1}.pth")
