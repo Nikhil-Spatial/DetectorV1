@@ -54,7 +54,6 @@ class ResidualBackbone(nn.Module):
         x = F.relu(self.conv_1(x))
 
         for res_block in self.res_blocks:
-            print(x.shape)
             x = res_block(x)
 
         return x
@@ -66,8 +65,6 @@ class DetectorHead(nn.Module):
         self.conv= nn.Conv2d(512, (C + B * 5), 1)
 
     def forward(self, x):
-        print(x.shape)
-        print(self.conv(x).shape)
         return self.conv(x)
 
 class Model(nn.Module):
@@ -82,8 +79,6 @@ class Model(nn.Module):
         x = self.detector_head(x)
 
         x = x.reshape((x.shape[0], S, S, C + B * 5))
-
-        print(x.shape)
 
         # Use sigmoid activation function on the x, y, w, h, and confidence
         for item in range(x.shape[0]):
