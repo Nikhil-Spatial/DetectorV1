@@ -64,11 +64,17 @@ for epoch in range(start_epoch, num_epochs):
     print(f"Starting Epoch {epoch+1}")
 
     # track time it takes for one epoch to complete
-    start_time = time.perf_counter()
+    total_start_time = time.perf_counter()
 
+    train_start_time = time.perf_counter()
     # a. train model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
 
+    train_end_time = time.perf_counter()
+
+    print(F"Training time: {train_end_time - train_start_time}")
+
+    val_start_time = time.perf_counter()
     # b. evaluate model performance on validation dataset every 5 epochs, but
     # track validation loss every epoch
     if (epoch+1) % 5 == 0:
@@ -77,7 +83,11 @@ for epoch in range(start_epoch, num_epochs):
     else:
         val_loss = compute_eval_stats(model, val_dl, device, loss_fn,
                                       loss_only=True)
+        val_mAP = "n/a"
 
+    val_end_time = time.perf_counter()
+
+    print(f"validation time: {val_end_time - val_start_time}")
     # c. save checkpoints
     checkpoint = {
         "epoch": epoch+1,
@@ -93,5 +103,5 @@ for epoch in range(start_epoch, num_epochs):
           f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP:.4f}")
 
     # e. display epoch duration
-    end_time = time.perf_counter()
-    print(f"Epoch took {end_time - start_time} seconds to complete.")
+    total_end_time = time.perf_counter()
+    print(f"Epoch took {total_end_time - total_start_time} seconds to complete.")

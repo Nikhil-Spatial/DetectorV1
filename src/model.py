@@ -54,22 +54,21 @@ class ResidualBackbone(nn.Module):
         x = F.relu(self.conv_1(x))
 
         for res_block in self.res_blocks:
+            print(x.shape)
             x = res_block(x)
 
-        return torch.flatten(x, start_dim=1)
-
+        return x
 
 class DetectorHead(nn.Module):
     def __init__(self):
         super().__init__()
 
-        self.fc_1 = nn.Linear(25_088, 4096)
-        self.dropout = nn.Identity()
-        self.fc_2 = nn.Linear(4096, (C + B * 5) * S * S)
+        self.conv= nn.Conv2d(512, (C + B * 5), 1)
 
     def forward(self, x):
-        x = self.dropout(F.relu(self.fc_1(x)))
-        return self.fc_2(x)
+        print(x.shape)
+        print(self.conv(x).shape)
+        return self.conv(x)
 
 class Model(nn.Module):
     def __init__(self):
@@ -82,9 +81,14 @@ class Model(nn.Module):
         x = self.backbone(x)
         x = self.detector_head(x)
 
-        # Use sigmoid activation function on the x, y, w, h, and confidence
-        for i in range(x.shape[0]):
-            for j in range(20, 1221, 25):
-                x[i][j:j+5] = F.sigmoid(x[i][j:j+5])
+        x = x.reshape((x.shape[0], S, S, C + B * 5))
 
-        return x.reshape((x.shape[0], S, S, C + B * 5))
+        print(x.shape)
+
+        # Use sigmoid activation function on the x, y, w, h, and confidence
+        for item in range(x.shape[0]):
+            for i in range(7):
+                for j in range(7):
+                    x[item][i][j][20:25] = F.sigmoid(x[item][i][j][20:25])
+
+        return x
