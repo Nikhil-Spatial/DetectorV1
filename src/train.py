@@ -61,26 +61,22 @@ if args.resume is not None:
 checkpoint_dir = Path("../outputs/checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
 
-train_loss_history, val_loss_history = [], []
-train_mAP_history, val_mAP_history = [], []
+train_loss_history, val_loss_history, val_mAP_history = [], [], []
 
 for epoch in range(start_epoch, num_epochs):
     print(f"Starting Epoch {epoch+1}")
 
     # a. Train Model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
-
-    # b. Evaluate Model Performance on Training Dataset
-    train_mAP = compute_eval_stats(model, train_dl, device)
     train_loss_history.append(train_loss)
-    train_mAP_history.append(train_mAP)
 
-    # c. Evaluate Model Performance on Validation Dataset
-    val_mAP, val_loss = compute_eval_stats(model, val_dl, device, loss_fn)
-    val_loss_history.append(val_loss)
-    val_mAP_history.append(val_mAP)
+    # b. Evaluate Model Performance on Validation Dataset Every 5 Epochs
+    if epoch % 5 == 0:
+        val_mAP, val_loss = compute_eval_stats(model, val_dl, device, loss_fn)
+        val_loss_history.append(val_loss)
+        val_mAP_history.append(val_mAP)
 
-    # d. Save Checkpoints
+    # c. Save Checkpoints
     checkpoint = {
         "epoch": epoch+1,
         "model_state_dict": model.state_dict(),
@@ -90,9 +86,9 @@ for epoch in range(start_epoch, num_epochs):
 
     torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch+1}.pth")
 
-    # e. Display Statistics
-    print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} mAP - "
-          f"{train_mAP:.4f} | Validation: Loss - {val_loss} mAP - {val_mAP}")
+    # d. Display Statistics
+    print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} "
+          f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP:.4f}")
 
 # 4. Plot and save all the history lists
 epoch_list = list(range(start_epoch+1, num_epochs+1))
