@@ -1,8 +1,6 @@
-from transforms import trainval_transforms, test_transforms
-from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 from inference_functions import compute_eval_stats
-from visualization import plot_history
+from transforms import trainval_transforms
 from configs import SEED, BATCH_SIZE
 from train_functions import train
 from dataset import ImageDataset
@@ -46,7 +44,7 @@ loss_fn = Loss().to(device)
 optimizer = torch.optim.Adam(model.parameters(), 1e-4)
 
 start_epoch = 0
-num_epochs = 15
+num_epochs = 75
 
 if args.resume is not None:
     checkpoint = torch.load(args.resume)
@@ -73,7 +71,7 @@ for epoch in range(start_epoch, num_epochs):
 
     # b. evaluate model performance on validation dataset every 5 epochs, but
     # track validation loss every epoch
-    if epoch % 5 == 0:
+    if (epoch+1) % 5 == 0:
         val_mAP, val_loss = compute_eval_stats(model, val_dl, device, loss_fn)
 
     else:
@@ -94,5 +92,6 @@ for epoch in range(start_epoch, num_epochs):
     print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} "
           f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP:.4f}")
 
+    # e. display epoch duration
     end_time = time.perf_counter()
     print(f"Epoch took {end_time - start_time} seconds to complete.")
