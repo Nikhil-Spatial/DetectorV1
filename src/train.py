@@ -36,7 +36,7 @@ train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2]
 train_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
 val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE)
 
-# 2. Instantiate model, loss function, device, optimizer, and scheduler
+# 2. instantiate model, loss function, device, optimizer, and scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
 model = Model().to(device)
@@ -57,26 +57,26 @@ if args.resume is not None:
 
     print(f"Resuming from epoch {start_epoch}")
 
-# 3. Training loop
+# 3. training loop
 checkpoint_dir = Path("../outputs/checkpoints")
 checkpoint_dir.mkdir(parents=True, exist_ok=True)
-
-train_loss_history, val_loss_history, val_mAP_history = [], [], []
 
 for epoch in range(start_epoch, num_epochs):
     print(f"Starting Epoch {epoch+1}")
 
-    # a. Train Model
+    # a. train model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
-    train_loss_history.append(train_loss)
 
-    # b. Evaluate Model Performance on Validation Dataset Every 5 Epochs
+    # b. evaluate model performance on validation dataset every 5 epochs, but
+    # track validation loss every epoch
     if epoch % 5 == 0:
         val_mAP, val_loss = compute_eval_stats(model, val_dl, device, loss_fn)
-        val_loss_history.append(val_loss)
-        val_mAP_history.append(val_mAP)
 
-    # c. Save Checkpoints
+    else:
+        val_loss = compute_eval_stats(model, val_dl, device, loss_fn,
+                                      loss_only=True)
+
+    # c. save checkpoints
     checkpoint = {
         "epoch": epoch+1,
         "model_state_dict": model.state_dict(),
@@ -86,16 +86,6 @@ for epoch in range(start_epoch, num_epochs):
 
     torch.save(checkpoint, checkpoint_dir / f"checkpoint_epoch_{epoch+1}.pth")
 
-    # d. Display Statistics
+    # d. display statistics
     print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} "
           f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP:.4f}")
-
-# 4. Plot and save all the history lists
-epoch_list = list(range(start_epoch+1, num_epochs+1))
-
-plot_history(epoch_list, train_loss_history, "training_loss")
-plot_history(epoch_list, val_loss_history, "val_loss")
-plot_history(epoch_list, train_mAP_history, "training_mAP")
-plot_history(epoch_list, val_mAP_history, "val_mAP")
-
-
