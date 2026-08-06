@@ -32,8 +32,10 @@ generator_ = torch.Generator().manual_seed(SEED)
 train_dataset, val_dataset = random_split(trainval_dataset, [0.8, 0.2]
                                           ,generator=generator_)
 
-train_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True)
-val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE)
+train_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True,
+                      num_workers=4, pin_memory=True)
+val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4,
+                    pin_memory=True)
 
 # 2. instantiate model, loss function, device, optimizer, and scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -72,7 +74,7 @@ for epoch in range(start_epoch, num_epochs):
 
     train_end_time = time.perf_counter()
 
-    print(F"Training time: {train_end_time - train_start_time}")
+    print(F"Training time: {(train_end_time - train_start_time):.4f}")
 
     val_start_time = time.perf_counter()
     # b. evaluate model performance on validation dataset every 5 epochs, but
@@ -83,11 +85,11 @@ for epoch in range(start_epoch, num_epochs):
     else:
         val_loss = compute_eval_stats(model, val_dl, device, loss_fn,
                                       loss_only=True)
-        val_mAP = "n/a"
+        val_mAP = None
 
     val_end_time = time.perf_counter()
 
-    print(f"validation time: {val_end_time - val_start_time}")
+    print(f"Validation time: {(val_end_time - val_start_time):.4f}")
     # c. save checkpoints
     checkpoint = {
         "epoch": epoch+1,
@@ -100,8 +102,8 @@ for epoch in range(start_epoch, num_epochs):
 
     # d. display statistics
     print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} "
-          f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP:.4f}")
+          f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP}")
 
     # e. display epoch duration
     total_end_time = time.perf_counter()
-    print(f"Epoch took {total_end_time - total_start_time} seconds to complete.")
+    print(f"Epoch took {(total_end_time - total_start_time):.4f} seconds to complete.")

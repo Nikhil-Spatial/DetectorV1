@@ -22,8 +22,8 @@ def compute_eval_stats(model, dl, device, loss_fn=None, loss_only=False,
     model.eval()
     with (torch.no_grad()):
         for X_batch, y_batch in dl:
-            X_batch = X_batch.to(device)
-            y_batch = y_batch.to(device)
+            X_batch = X_batch.to(device, non_blocking=True)
+            y_batch = y_batch.to(device, non_blocking=True)
 
             # 1. forward pass
             preds_batch = model(X_batch)
