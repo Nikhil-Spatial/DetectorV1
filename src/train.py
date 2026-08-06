@@ -9,7 +9,18 @@ from dataset import ImageDataset
 from loss_function import Loss
 from pathlib import Path
 from model import Model
+import argparse
 import torch
+
+# add command line argument to resume training at a certain checkpoint
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "--resume",
+    type=str,
+    default=None,
+    help="Path to checkpoint to resume training from."
+)
+args = parser.parse_args()
 
 annot_file_trainval = Path("../data/preprocessed/trainval/annotations.csv")
 img_dir_trainval = Path("../data/preprocessed/trainval/Images")
@@ -27,12 +38,24 @@ val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE)
 
 # 2. Instantiate model, loss function, device, optimizer, and scheduler
 device = "cuda" if torch.cuda.is_available() else "cpu"
-num_epochs = 15
 
 model = Model().to(device)
 loss_fn = Loss().to(device)
 
 optimizer = torch.optim.Adam(model.parameters(), 1e-4)
+
+start_epoch = 0
+num_epochs = 15
+
+if args.resume is not None:
+    checkpoint = torch.load(args.resume)
+
+    model.load_state_dict(checkpoint["model_state_dict"])
+    optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+
+    start_epoch = checkpoint["epoch"]
+
+    print(f"Resuming from epoch {start_epoch}")
 
 # 3. Training loop
 checkpoint_dir = Path("../outputs/checkpoints")
@@ -41,7 +64,9 @@ checkpoint_dir.mkdir(parents=True, exist_ok=True)
 train_loss_history, val_loss_history = [], []
 train_mAP_history, val_mAP_history = [], []
 
-for epoch in range(num_epochs):
+for epoch in range(start_epoch, num_epochs):
+    print(f"Starting Epoch {epoch+1}")
+
     # a. Train Model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
 
@@ -70,7 +95,7 @@ for epoch in range(num_epochs):
           f"{train_mAP:.4f} | Validation: Loss - {val_loss} mAP - {val_mAP}")
 
 # 4. Plot and save all the history lists
-epoch_list = list(range(1, num_epochs+1))
+epoch_list = list(range(start_epoch+1, num_epochs+1))
 
 plot_history(epoch_list, train_loss_history, "training_loss")
 plot_history(epoch_list, val_loss_history, "val_loss")

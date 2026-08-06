@@ -1,3 +1,20 @@
 .ipynb_checkpoints
-.idea
-__pycache__
+
+__pycache__/
+*.py[cod]
+.venv/S
+venv/
+
+.idea/
+.vscode/
+
+# Training outputs
+outputs/checkpoints/
+outputs/models/
+outputs/predictions/
+outputs/plots/
+
+*.log
+
+.DS_Store
+Thumbs.db
