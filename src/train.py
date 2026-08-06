@@ -11,6 +11,7 @@ from pathlib import Path
 from model import Model
 import argparse
 import torch
+import time
 
 # add command line argument to resume training at a certain checkpoint
 parser = argparse.ArgumentParser()
@@ -64,6 +65,9 @@ checkpoint_dir.mkdir(parents=True, exist_ok=True)
 for epoch in range(start_epoch, num_epochs):
     print(f"Starting Epoch {epoch+1}")
 
+    # track time it takes for one epoch to complete
+    start_time = time.perf_counter()
+
     # a. train model
     train_loss = train(model, loss_fn, optimizer, train_dl, device)
 
@@ -89,3 +93,6 @@ for epoch in range(start_epoch, num_epochs):
     # d. display statistics
     print(f"(Epoch {epoch+1}) Training: Loss - {train_loss:.4f} "
           f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP:.4f}")
+
+    end_time = time.perf_counter()
+    print(f"Epoch took {end_time - start_time} seconds to complete.")
