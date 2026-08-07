@@ -33,9 +33,9 @@ class Model(nn.Module):
 
         # Use sigmoid activation function on the x, y, w, h, and confidence
         for item in range(x.shape[0]):
-            for i in range(7):
-                for j in range(7):
-                    x[item][i][j][20:22] = F.sigmoid(x[item][i][j][20:22])
-                    x[item][i][j][24] = F.sigmoid(x[item][i][j][24])
+            for i in range(S):
+                for j in range(S):
+                    x[item][i][j][C:C+2] = F.sigmoid(x[item][i][j][C:C+2])
+                    x[item][i][j][C+4] = F.sigmoid(x[item][i][j][C+4])
 
         return x
