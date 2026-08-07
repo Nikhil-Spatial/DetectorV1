@@ -1,7 +1,7 @@
 from torchvision.models.feature_extraction import create_feature_extractor
 from torchvision.models import resnet18
 import torch.nn.functional as F
-from configs import S, B, C
+from src.configs import S, B, C
 import torch.nn as nn
 import torch
 
@@ -29,12 +29,13 @@ class Model(nn.Module):
         x = self.backbone(x)["layer4"]
         x = self.detector_head(x)
 
-        x = x.reshape((x.shape[0], S, S, C + B * 5))
+        x = x.permute(0, 2, 3, 1)
 
         # Use sigmoid activation function on the x, y, w, h, and confidence
         for item in range(x.shape[0]):
             for i in range(7):
                 for j in range(7):
-                    x[item][i][j][20:25] = F.sigmoid(x[item][i][j][20:25])
+                    x[item][i][j][20:22] = F.sigmoid(x[item][i][j][20:22])
+                    x[item][i][j][24] = F.sigmoid(x[item][i][j][24])
 
         return x
