@@ -34,9 +34,9 @@ def main():
                                               ,generator=generator_)
 
     train_dl = DataLoader(train_dataset, batch_size=BATCH_SIZE, shuffle=True,
-                          num_workers=4, pin_memory=True)
+                          num_workers=4, pin_memory=True, persistent_workers=True)
     val_dl = DataLoader(val_dataset, batch_size=BATCH_SIZE, num_workers=4,
-                        pin_memory=True)
+                        pin_memory=True, persistent_workers=True)
 
     # 2. instantiate model, loss function, device, optimizer, and scheduler
     device = "cuda" if torch.cuda.is_available() else "cpu"

@@ -42,12 +42,12 @@ class ResidualBackbone(nn.Module):
 
         self.res_blocks.append(ResidualBlock(64, 128, 2))
         self.res_blocks.append(ResidualBlock(128, 128, 1))
-        self.res_blocks.append(ResidualBlock(128, 128, 1))
-        self.res_blocks.append(ResidualBlock(128, 256, 2))
+        self.res_blocks.append(ResidualBlock(128, 128, 2))
+        self.res_blocks.append(ResidualBlock(128, 256, 1))
         self.res_blocks.append(ResidualBlock(256, 256, 2))
         self.res_blocks.append(ResidualBlock(256, 256, 1))
-        self.res_blocks.append(ResidualBlock(256, 256, 1))
         self.res_blocks.append(ResidualBlock(256, 512, 2))
+        self.res_blocks.append(ResidualBlock(512, 512, 1))
         self.res_blocks.append(ResidualBlock(512, 512, 2))
 
     def forward(self, x):
