@@ -23,8 +23,7 @@ def main():
     )
     parser.add_argument(
         "--optimizer",
-        type=bool,
-        default=False,
+        action="store_true",
         help="Whether or not to resume training with a fresh optimizer or not."
     )
     args = parser.parse_args()
