@@ -56,7 +56,6 @@ def average_precision(tp_fp_by_class, class_object_totals,
 
     for class_name, tp_fp_list in tp_fp_by_class.items():
         if class_object_totals[class_name] == 0:
-            ap_by_class[class_name] = 0
             continue
 
         # declare/reset average precision to zero
