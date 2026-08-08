@@ -29,3 +29,9 @@ I developed this project from scratch, writing code for data preprocessing and p
 - I used the cosine annealing learning rate scheduler with a minimum learning rate of 1e-6 for both the backbone and detector head.
 - I saved checkpoints of the model after each epoch.
 - I recorded training and validation loss during each epoch, and computed the validation dataset's mean average precision (mAP) every 5 epochs.
+
+## 📝 Postprocessing
+- Decode the predictions to discern the class prediction and convert the coordinates back to (x1, y1, x2, y2) form.
+- Filter out the predictions which have a confidence score lower than the threshold of 0.5.
+- While filtering, group the predictions by predicted class in a dictionary.
+- 
