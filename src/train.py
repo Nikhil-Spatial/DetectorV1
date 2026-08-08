@@ -21,6 +21,12 @@ def main():
         default=None,
         help="Path to checkpoint to resume training from."
     )
+    parser.add_argument(
+        "--optimizer",
+        type=bool,
+        default=False,
+        help="Whether or not to resume training with a fresh optimizer or not."
+    )
     args = parser.parse_args()
 
     annot_file_trainval = Path("../data/preprocessed/trainval/annotations.csv")
@@ -59,11 +65,14 @@ def main():
         checkpoint = torch.load(args.resume)
 
         model.load_state_dict(checkpoint["model_state_dict"])
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
 
         start_epoch = checkpoint["epoch"]
 
         print(f"Resuming from epoch {start_epoch}")
+
+    if args.optimizer:
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
 
     # 3. training loop
     checkpoint_dir = Path("../outputs/checkpoints")
@@ -94,6 +103,7 @@ def main():
             "epoch": epoch+1,
             "model_state_dict": model.state_dict(),
             "optimizer_state_dict": optimizer.state_dict(),
+            "scheduler_state_dict": scheduler.state_dict(),
             "val_loss": val_loss
         }
 

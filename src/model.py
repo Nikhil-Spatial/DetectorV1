@@ -23,10 +23,12 @@ class Model(nn.Module):
         resnet_feature_extractor = create_feature_extractor(resnet, ["layer4"])
 
         self.backbone = resnet_feature_extractor
+        self.dropout = nn.Dropout()
         self.detector_head = DetectorHead()
 
     def forward(self, x):
         x = self.backbone(x)["layer4"]
+        x = self.dropout(x)
         x = self.detector_head(x)
 
         x = x.permute(0, 2, 3, 1)
