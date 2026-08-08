@@ -50,10 +50,10 @@ def main():
     model = Model().to(device, non_blocking=True)
     loss_fn = Loss().to(device, non_blocking=True)
 
-    optimizer = torch.optim.Adam([
+    optimizer = torch.optim.SGD([
         {"params": model.backbone.parameters(), "lr": 1e-4},
         {"params": model.detector_head.parameters()}
-    ], lr=1e-3)
+    ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
 
     start_epoch = 0
     num_epochs = 50
@@ -65,13 +65,14 @@ def main():
 
         model.load_state_dict(checkpoint["model_state_dict"])
 
-        start_epoch = checkpoint["epoch"]
+        if args.optimizer:
+            optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+            scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+            start_epoch = checkpoint["epoch"]
 
         print(f"Resuming from epoch {start_epoch}")
 
-    if args.optimizer:
-        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+
 
     # 3. training loop
     checkpoint_dir = Path("../outputs/checkpoints")
