@@ -16,3 +16,7 @@ I developed this project from scratch, writing code for data preprocessing and p
 - In the 25 channels, the first 20 channels represent the classification portion of the task, and the final 5 channels represent the bounding box prediction (x, y, w, h, and confidence score).
 - The model's output vector is of the form [B, W, H, C], where B = batch size, W and H are the spatial dimensions, and C is the channel count.
 - In the bounding box portion of the prediction vector, the x, y, and confidence score predictions are activated using a sigmoid layer to map, potentially, negative values to [0, 1].
+
+## ƒ Loss Function
+- I implemented the exact loss function described in the YOLOv1 paper.
+- ![Uploading image.png…]()
