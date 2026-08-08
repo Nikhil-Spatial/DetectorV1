@@ -6,7 +6,7 @@ I developed this project from scratch, writing code for data preprocessing and p
 
 ## 📌 Methods
 
-Preprocessing: 
+### Preprocessing: 
 - I converted the bounding box coordinates of ground truth labels from (x1, y1, x2, y2), where each x-y pair represents a corner of the bounding box, to (x, y, w, h) where x and y represent the center of the bounding box, and w and h represent the width and height of the bounding box, respectively.
 - Due to memory and GPU restrictions, I resized every image to 224 x 224 instead of 448 x 448, as described in the YOLOv1 paper. The biggest benefit of this was considerably speeding up training time.
 - I normalized the image pixels to fall in [0, 1] by dividing each pixel by 255.
