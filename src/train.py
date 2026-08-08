@@ -72,8 +72,6 @@ def main():
 
         print(f"Resuming from epoch {start_epoch}")
 
-
-
     # 3. training loop
     checkpoint_dir = Path("../outputs/checkpoints")
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
