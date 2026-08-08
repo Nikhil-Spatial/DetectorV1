@@ -1,6 +1,6 @@
 def train(model, loss_fn, optimizer, train_dl, device):
     model.train()
-    total_loss = 0
+    epoch_loss = 0.0
 
     for X_batch, y_batch in train_dl:
         X_batch = X_batch.to(device, non_blocking=True)
@@ -21,8 +21,8 @@ def train(model, loss_fn, optimizer, train_dl, device):
         # 5. optimizer step
         optimizer.step()
 
-        total_loss += loss.item()
+        epoch_loss += loss.item()
 
-    return total_loss / len(train_dl) # returns average loss
+    return epoch_loss / len(train_dl) # returns average loss over the epoch
 
 

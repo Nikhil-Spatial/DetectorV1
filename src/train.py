@@ -1,3 +1,4 @@
+from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import random_split, DataLoader
 from inference_functions import compute_eval_stats
 from transforms import trainval_transforms
@@ -44,10 +45,15 @@ def main():
     model = Model().to(device, non_blocking=True)
     loss_fn = Loss().to(device, non_blocking=True)
 
-    optimizer = torch.optim.Adam(model.parameters(), 1e-4)
+    optimizer = torch.optim.Adam([
+        {"params": model.backbone.parameters(), "lr": 1e-4},
+        {"params": model.detector_head.parameters()}
+    ], lr=1e-3)
 
     start_epoch = 0
-    num_epochs = 75
+    num_epochs = 50
+
+    scheduler = CosineAnnealingLR(optimizer, num_epochs, 1e-6)
 
     if args.resume is not None:
         checkpoint = torch.load(args.resume)
@@ -67,17 +73,12 @@ def main():
         print(f"Starting Epoch {epoch+1}")
 
         # track time it takes for one epoch to complete
-        total_start_time = time.perf_counter()
+        start_time = time.perf_counter()
 
-        train_start_time = time.perf_counter()
         # a. train model
         train_loss = train(model, loss_fn, optimizer, train_dl, device)
+        scheduler.step()
 
-        train_end_time = time.perf_counter()
-
-        print(F"Training time: {(train_end_time - train_start_time):.4f}")
-
-        val_start_time = time.perf_counter()
         # b. evaluate model performance on validation dataset every 5 epochs, but
         # track validation loss every epoch
         if (epoch+1) % 5 == 0:
@@ -88,9 +89,6 @@ def main():
                                           loss_only=True)
             val_mAP = None
 
-        val_end_time = time.perf_counter()
-
-        print(f"Validation time: {(val_end_time - val_start_time):.4f}")
         # c. save checkpoints
         checkpoint = {
             "epoch": epoch+1,
@@ -106,8 +104,8 @@ def main():
               f"| Validation: Loss - {val_loss:.4f} mAP - {val_mAP}")
 
         # e. display epoch duration
-        total_end_time = time.perf_counter()
-        print(f"Epoch took {(total_end_time - total_start_time):.4f} seconds to complete.")
+        end_time = time.perf_counter()
+        print(f"Epoch took {(end_time - start_time):.4f} seconds to complete.")
 
 if __name__ == "__main__":
     main()

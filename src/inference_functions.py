@@ -1,10 +1,10 @@
-from src.evaluation import (find_tp_and_fp, count_objects_in_each_class,
+from evaluation import (find_tp_and_fp, count_objects_in_each_class,
                             evaluate)
-from src.utilities import (get_ground_truth_objects_by_class,
+from utilities import (get_ground_truth_objects_by_class,
                            get_empty_precision_recall_lists,
                            get_empty_class_object_totals,
                            get_empty_tp_fp_by_class)
-from src.postprocessing import postprocess_preds
+from postprocessing import postprocess_preds
 import torch
 
 def compute_eval_stats(model, dl, device, loss_fn=None, loss_only=False,

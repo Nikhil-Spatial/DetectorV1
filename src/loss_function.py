@@ -1,4 +1,4 @@
-from src.configs import LAMBDA_COORD, LAMBDA_NOOBJ, S, C, B
+from configs import LAMBDA_COORD, LAMBDA_NOOBJ, S, C, B
 import torch
 
 class Loss(torch.nn.Module):

@@ -1,4 +1,4 @@
-from src.configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, C, S, B
+from configs import CLASS_TO_IDX, IDX_TO_CLASS, CELL_SIZE, IMAGE_SIZE, C, S, B
 from torchvision.io import decode_image
 from torch.utils.data import Dataset
 import pandas as pd

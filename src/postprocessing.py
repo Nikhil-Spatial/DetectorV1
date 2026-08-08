@@ -1,6 +1,6 @@
-from src.configs import (S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD,
+from configs import (S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD,
                          NMS_IOU_THRESHOLD)
-from src.utilities import convert_xywh_coordinates, IoU
+from utilities import convert_xywh_coordinates, IoU
 from operator import itemgetter
 import torch
 
