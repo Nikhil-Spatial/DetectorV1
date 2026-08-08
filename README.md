@@ -19,4 +19,4 @@ I developed this project from scratch, writing code for data preprocessing and p
 
 ## ƒ Loss Function
 - I implemented the exact loss function described in the YOLOv1 paper.
-- ![Uploading image.png…]()
+![Loss Function](assets/loss function.png)
