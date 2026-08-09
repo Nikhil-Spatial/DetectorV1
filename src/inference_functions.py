@@ -1,9 +1,8 @@
 from evaluation import (find_tp_and_fp, count_objects_in_each_class,
-                            evaluate)
+                        evaluate)
 from utilities import (get_ground_truth_objects_by_class,
-                           get_empty_precision_recall_lists,
-                           get_empty_class_object_totals,
-                           get_empty_tp_fp_by_class)
+                       get_empty_class_object_totals,
+                       get_empty_tp_fp_by_class)
 from postprocessing import postprocess_preds
 import torch
 
@@ -15,9 +14,6 @@ def compute_eval_stats(model, dl, device, loss_fn=None, loss_only=False,
     if not loss_only:
         tp_fp_by_class = get_empty_tp_fp_by_class()
         class_object_totals = get_empty_class_object_totals()
-
-    if test:
-        precision_recall_lists = get_empty_precision_recall_lists()
 
     model.eval()
     with (torch.no_grad()):
@@ -45,15 +41,17 @@ def compute_eval_stats(model, dl, device, loss_fn=None, loss_only=False,
 
                     find_tp_and_fp(postprocessed_preds,
                                    ground_truth_objects_by_class, tp_fp_by_class)
-                    count_objects_in_each_class(ground_truth_objects_by_class,
-                                                class_object_totals)
+                    count_objects_in_each_class(
+                        ground_truth_objects_by_class, class_object_totals
+                    )
 
         # 4. Compute average precision (AP) for each class and mean average
         # precision (mAP) across all classes
         if not loss_only:
             if test:
-                mAP, ap_by_class = evaluate(tp_fp_by_class, class_object_totals,
-                                        precision_recall_lists, True)
+                mAP, ap_by_class = evaluate(
+                    tp_fp_by_class, class_object_totals, True
+                )
             else:
                 mAP = evaluate(tp_fp_by_class, class_object_totals)
 
@@ -66,6 +64,6 @@ def compute_eval_stats(model, dl, device, loss_fn=None, loss_only=False,
         return mAP, avg_loss
 
     elif test:
-        return mAP, ap_by_class, precision_recall_lists
+        return mAP, ap_by_class
 
     return mAP

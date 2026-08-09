@@ -119,29 +119,3 @@ def get_empty_class_object_totals():
     }
 
     return class_object_totals
-
-def get_empty_precision_recall_lists():
-    precision_recall_lists = {
-        "aeroplane": ([], []),
-        "bicycle": ([], []),
-        "bird": ([], []),
-        "boat": ([], []),
-        "bottle": ([], []),
-        "bus": ([], []),
-        "car": ([], []),
-        "cat": ([], []),
-        "chair": ([], []),
-        "cow": ([], []),
-        "diningtable": ([], []),
-        "dog": ([], []),
-        "horse": ([], []),
-        "motorbike": ([], []),
-        "person": ([], []),
-        "pottedplant": ([], []),
-        "sheep": ([], []),
-        "sofa": ([], []),
-        "train": ([], []),
-        "tvmonitor": ([], []),
-    }
-
-    return precision_recall_lists
