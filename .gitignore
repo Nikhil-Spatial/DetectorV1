@@ -10,9 +10,7 @@ venv/
 
 # Training outputs
 outputs/checkpoints/
-outputs/models/
-outputs/predictions/
-outputs/plots/
+outputs/bounded_images/
 
 *.log
 
