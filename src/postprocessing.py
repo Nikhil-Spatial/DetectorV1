@@ -1,6 +1,6 @@
-from configs import (S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD,
+from src.configs import (S, C, B, IDX_TO_CLASS, CONFIDENCE_THRESHOLD,
                          NMS_IOU_THRESHOLD)
-from utilities import convert_xywh_coordinates, IoU
+from src.utilities import convert_xywh_coordinates, IoU
 from operator import itemgetter
 import torch
 
@@ -16,7 +16,7 @@ def decode_preds(preds):
             class_prob = cell[class_idx]
 
             confidence_score = cell[C+4] * class_prob
-            bbox = convert_xywh_coordinates(cell[C:C+4], i, j, False)
+            bbox = convert_xywh_coordinates(cell[C:C+4], i, j)
 
             decoded_preds.append((class_idx, confidence_score) + bbox)
 
@@ -66,7 +66,7 @@ def non_maximum_suppression(filtered_grouped_preds):
     # order instead of increasing order.
     return suppressed_preds
 
-def postprocess_preds(preds):
+def postprocess_preds(preds, draw):
     # 1. Decode predictions
     decoded_preds = decode_preds(preds)
 
