@@ -21,11 +21,6 @@ def main():
         default=None,
         help="Path to checkpoint to resume training from."
     )
-    parser.add_argument(
-        "--optimizer",
-        action="store_true",
-        help="Whether or not to resume training with a fresh optimizer or not."
-    )
     args = parser.parse_args()
 
     annot_file_trainval = Path("../data/preprocessed/trainval/annotations.csv")
@@ -50,13 +45,13 @@ def main():
     model = Model().to(device, non_blocking=True)
     loss_fn = Loss().to(device, non_blocking=True)
 
-    optimizer = torch.optim.SGD([
+    optimizer = torch.optim.AdamW([
         {"params": model.backbone.parameters(), "lr": 1e-4},
-        {"params": model.detector_head.parameters()}
-    ], lr=1e-3, momentum=0.9, weight_decay=5e-4)
+        {"params": model.detector_head.parameters(), "lr": 1e-3}
+    ], weight_decay=5e-4)
 
     start_epoch = 0
-    num_epochs = 50
+    num_epochs = 100
 
     scheduler = CosineAnnealingLR(optimizer, num_epochs, 1e-6)
 
@@ -64,11 +59,9 @@ def main():
         checkpoint = torch.load(args.resume)
 
         model.load_state_dict(checkpoint["model_state_dict"])
-
-        if args.optimizer:
-            optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-            scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
-            start_epoch = checkpoint["epoch"]
+        optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
+        scheduler.load_state_dict(checkpoint["scheduler_state_dict"])
+        start_epoch = checkpoint["epoch"]
 
         print(f"Resuming from epoch {start_epoch}")
 
