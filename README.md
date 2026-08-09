@@ -1,5 +1,4 @@
 # 📷 **DetectorV1**
-
 As my first computer vision project, I decided to loosely implement YOLOv1 to gain experience with object detectors.
 This is not a complete paper implementation, however, because I changed aspects of the original paper such as the architecture and preprocessing to better accommodate my hardware restrictions. 
 I developed this project from scratch, writing code for data preprocessing and postprocessing, loss function, evaluation functions, and the training loop, among other things. 
@@ -42,3 +41,16 @@ I developed this project from scratch, writing code for data preprocessing and p
 - Make another dictionary that records the total number of predictions under each class.
 - Compute the average precision (AP) of each class.
 - Compute the mean average precision (mAP) by averaging the AP results.
+
+## 📊 Results
+The model's performance was not great, but I am satisfied with the results as this project taught me a lot about the machine learning workflow from first principles.  
+
+During training, the best model's training loss was 0.5334, validation loss was 6.1251 (a clear sign of overfitting), and the validation mAP was 14.51%.  
+
+On the test set, the best model's mAP is 13.31%.  
+
+Below are some example images, comparing the predicted bounding boxes (images to the left) to the ground truth bounding boxes (images to the right):  
+<img src="outputs/bounded_images/11652pred.png" width="350"> <img src="outputs/bounded_images/11652truth.png" width="350">
+<img src="outputs/bounded_images/80327pred.png" width="350"> <img src="outputs/bounded_images/80327truth.png" width="350">
+<img src="outputs/bounded_images/92109pred.png" width="350"> <img src="outputs/bounded_images/92109truth.png" width="350">
+<img src="outputs/bounded_images/57010pred.png" width="350"> <img src="outputs/bounded_images/57010truth.png" width="350">
