@@ -30,8 +30,15 @@ I developed this project from scratch, writing code for data preprocessing and p
 - I saved checkpoints of the model after each epoch.
 - I recorded training and validation loss during each epoch, and computed the validation dataset's mean average precision (mAP) every 5 epochs.
 
-## 📝 Postprocessing
+## ⚙️ Postprocessing
 - Decode the predictions to discern the class prediction and convert the coordinates back to (x1, y1, x2, y2) form.
 - Filter out the predictions which have a confidence score lower than the threshold of 0.5.
 - While filtering, group the predictions by predicted class in a dictionary.
-- 
+- In the dictionary, all predictions under each class are sorted by ascending order.
+- Non-maximum suppression (NMS) is used to remove predictions with bounding box intersection over unions (IOU) of at least 0.5.
+
+## 📝 Evaluation
+- Convert the predictions under each class in the dictionary into true positives if its IoU with the ground truth label is at least 0.5, and false positives otherwise.
+- Make another dictionary that records the total number of predictions under each class.
+- Compute the average precision (AP) of each class.
+- Compute the mean average precision (mAP) by averaging the AP results.
