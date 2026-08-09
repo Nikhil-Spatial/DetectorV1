@@ -38,7 +38,7 @@ I developed this project from scratch, writing code for data preprocessing and p
 
 ## 📝 Evaluation
 - Convert the predictions under each class in the dictionary into true positives if its IoU with the ground truth label is at least 0.5, and false positives otherwise.
-- Make another dictionary that records the total number of predictions under each class.
+- Make another dictionary that records the total number of ground truth labels under each class.
 - Compute the average precision (AP) of each class.
 - Compute the mean average precision (mAP) by averaging the AP results.
 
