@@ -56,3 +56,6 @@ Below are some example images, comparing the predicted bounding boxes (images to
 <img src="outputs/bounded_images/57010pred.png" width="350"> <img src="outputs/bounded_images/57010truth.png" width="350">  
 
 As can be seen above, the detector is able to predict well when there are larger objects visible in the image, but smaller objects are much more difficult. This is most likely due to the image resolution being 224 x 224. I am sure a larger image resolution such as 448 x 448 would produce much better results.  
+
+## 📖 References
+*You Only Look Once: Unified, Real-Time Object Detection* - https://arxiv.org/abs/1506.02640
